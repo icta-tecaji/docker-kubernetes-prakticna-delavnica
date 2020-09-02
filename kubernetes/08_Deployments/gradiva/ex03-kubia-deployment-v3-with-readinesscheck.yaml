@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubia
+spec:
+  strategy:
+    type: RollingUpdate
+  replicas: 3
+  minReadySeconds: 15
+  template:
+    metadata:
+      name: kubia
+      labels:
+        app: kubia
+    spec:
+      containers:
+      - image: leon11sj/kubia:v3
+        name: nodejs
+        imagePullPolicy: Always
+        readinessProbe:
+          periodSeconds: 1
+          httpGet:
+            path: /
+            port: 8080
+  selector:
+    matchLabels:
+      app: kubia
+      
+      

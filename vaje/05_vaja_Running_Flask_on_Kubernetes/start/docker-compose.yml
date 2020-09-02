@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+
+  flask:
+    image: mjhea0/flask-kubernetes:latest
+    ports:
+      - 5000:5000
+    environment:
+      - FLASK_ENV=development
+      - APP_SETTINGS=project.config.DevelopmentConfig
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - postgres
+
+  postgres:
+    build:
+      context: ./services/db
+      dockerfile: Dockerfile
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  client:
+    image: mjhea0/vue-kubernetes:latest
+    ports:
+      - 8080:8080
+    environment:
+      - ROOT_API=http://flask:5001
+    depends_on:
+      - flask
+
+
