@@ -1,0 +1,43 @@
+# pull official base image
+FROM python:3.8.1-slim-buster
+
+LABEL maintainer="leon@ltfe.org"
+
+# set environment variables
+ENV APPROOT="/home/app/web" \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    VERSION="0.1" 
+
+LABEL base.name="Smart API" \
+      base.version="${VERSION}"
+
+# create the app user
+RUN groupadd -r -g 2200 app && \
+    useradd -rM -g app -u 2200 app
+
+# set work directory
+WORKDIR $APPROOT
+
+EXPOSE 5000
+
+# install dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends netcat
+RUN pip install --upgrade pip
+COPY ./requirements.txt $APPROOT/requirements.txt
+RUN pip install -r requirements.txt
+
+# copy project
+COPY . $APPROOT
+
+# chown all the files to the app user
+RUN chown -R app:app $APPROOT
+
+# za testne namene
+RUN apt-get install -y procps
+
+# change to the app user
+USER app
+
+
+ENTRYPOINT ["python", "main.py"]

@@ -1,0 +1,3 @@
+FROM alpine
+ENTRYPOINT top -b
+CMD -l

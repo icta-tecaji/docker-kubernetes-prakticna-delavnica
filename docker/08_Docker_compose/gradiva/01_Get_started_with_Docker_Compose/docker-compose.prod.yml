@@ -1,0 +1,36 @@
+version: '3.7'
+services:
+  nginx:
+    build: 
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - 80:8080
+    depends_on:
+      - web
+    networks:
+      - frontend
+  web:
+    image: leon11sj/counter
+    entrypoint: ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app"]
+    expose:
+      - 5000
+    networks:
+      - backend
+      - frontend
+    depends_on:
+      - redis
+  redis:
+    image: "redis:alpine"
+    volumes:
+      - redis-data:/data
+    networks:  
+      - backend
+    
+
+networks:
+  frontend:
+  backend:
+  
+volumes:
+  redis-data:
