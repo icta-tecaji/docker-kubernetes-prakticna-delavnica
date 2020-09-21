@@ -6,7 +6,7 @@
 
 ### Online courses
 - [][Udacity - Scalable Microservices with Kubernetes](https://www.udacity.com/course/scalable-microservices-with-kubernetes--ud615)
-- 
+- https://www.eksworkshop.com/
 
 ### Books:
 - [][Kubernetes: Up and Running](https://www.oreilly.com/library/view/kubernetes-up-and/9781491935668/)
