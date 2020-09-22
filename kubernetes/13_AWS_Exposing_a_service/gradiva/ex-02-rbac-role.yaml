@@ -24,7 +24,7 @@ rules:
       - update
       - watch
       - patch
-  - apiGroups:
+      - apiGroups:
       - ""
       - extensions
     resources:
