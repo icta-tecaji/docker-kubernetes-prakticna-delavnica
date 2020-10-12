@@ -1,0 +1,1 @@
+Dostop do historija: curl 172.31.12.18:9000
