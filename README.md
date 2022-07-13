@@ -1,3 +1,27 @@
+# Praktična delavnica Docker & Kubernetes
+
+## Del 1: Intro To Docker
+
+
+## Del 4: Storage and volumes
+- https://docs.docker.com/storage/storagedriver/
+
+## Del 9: Building Images
+
+
+- Best practices for writing Dockerfiles
+
+
+## Gradiva
+- [Docker Official Samples](https://docs.docker.com/samples/#tutorial-labs)
+
+
+
+
+
+
+
+
 # Docker
 - zakaj docker (lažja inštalacija) - se pokaže primer
 - kaj je docker
