@@ -2,23 +2,41 @@
 
 ## Del 1: Intro To Docker
 
+## Del 2: Containers
 
-## Del 4: Storage and volumes
+## Del 3: Docker Storage And Volumes
 - https://docs.docker.com/storage/storagedriver/
 
-## Del 9: Building Images
+## Del 4: Docker Networking
 
-
+## Del 5: Building Images
 - Best practices for writing Dockerfiles
+- Optimizing your Docker images
 
+## Del 6: Sharing Docker Images
+
+## Del 7: Running Multi-container Apps With Docker Compose
+
+## Del 8: Docker Reliability And Health Checks
+- Resource control
+
+## Del 9: Managing Application Logs
+
+## Del 10: Monitoring
+- Portainer
+
+## Del 11: Docker Configuration Management
+
+## Del 12: Docker Security
+
+## Del 13: Advanced Docker
+- Controlling HTTP traffic to containers with a reverse proxy
+- Asynchronous communication with a message queue
 
 ## Gradiva
 - [Docker Official Samples](https://docs.docker.com/samples/#tutorial-labs)
-
-
-
-
-
+- https://nickjanetakis.com/blog/tag/docker-tips-tricks-and-tutorials
+- https://collabnix.com/
 
 
 
