@@ -1,6 +1,13 @@
 # Praktična delavnica Docker & Kubernetes
 
 ## Del 1: Intro To Docker
+- Docker overview
+- Why are containers and Docker so important?
+- Installing Docker
+
+
+
+- Docker Architecture
 
 ## Del 2: Containers
 
@@ -16,6 +23,7 @@
 ## Del 6: Sharing Docker Images
 
 ## Del 7: Running Multi-container Apps With Docker Compose
+- razlika med verzijami composa in kako se inštwlira
 
 ## Del 8: Docker Reliability And Health Checks
 - Resource control
@@ -35,6 +43,8 @@
 
 ## Gradiva
 - [Docker Official Samples](https://docs.docker.com/samples/#tutorial-labs)
+- [Github: Microservices Demo](https://github.com/microservices-demo)
+
 - https://nickjanetakis.com/blog/tag/docker-tips-tricks-and-tutorials
 - https://collabnix.com/
 
