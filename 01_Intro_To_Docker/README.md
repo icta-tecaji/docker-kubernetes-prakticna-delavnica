@@ -40,6 +40,10 @@ for operators and developers across the industry—in the 2019 Stack Overflow su
     - Portability between operating systems is a major problem for software users.
     - Software running in Docker containers need be written only once against a consistent set of dependencies.
         - That means your desktop, your development environment, your company’s server, and your company’s cloud can all run the same programs.
+- **Getting organized**
+    - Without Docker, a computer can end up looking like a junk drawer. Applications have all sorts of dependencies. Some applications depend on specific system libraries for common things like sound, networking, graphics, and so on. Others depend on standard libraries for the language they’re written in. Some depend on other applications, such as the way a Java program depends on the Java Virtual Machine, or a web application might depend on a database. It’s common for a running program to require exclusive access to a scarce resource such as a network connection or a file.
+    - Docker keeps things organized by isolating everything with containers and images.
+
 
 ## Installing Docker
 
@@ -79,9 +83,90 @@ Docker Engine is an open source containerization technology for building and con
 First check Docker itself with the docker version command:
 - `docker version`
 
+## Running Hello World in a container
+You’re going to send a command to Docker, telling it to run a container that
+prints out some simple “Hello, World” text.
 
+Enter this command, which will run the Hello World container: `sudo docker container run hello-world` or `sudo docker run hello-world`
+
+> Both commands are exactly the same. Prior to docker 1.13 the docker run command was only available. The CLI commands were then refactored to have the form docker COMMAND SUBCOMMAND, wherein this case the COMMAND is container and the SUBCOMMAND is run.
+
+1. The docker container run command tells Docker to run an application in a container. 
+2. This application has already been packaged to run in Docker and has been published on a public site that anyone can access.
+3. The container package (which Docker calls an “image”) is named hello-world.
+4. The command you’ve just entered tells Docker to run a container from that image.
+5. After the echo command prints "hello world" to the terminal, the program exits, and the container is marked as stopped.
+
+Run and check for a container:
+- List all running container processes: `sudo docker ps`
+- `sudo docker ps -a`
+
+Docker needs to have a copy of the image locally before it can run a container
+using the image. The very first time you run this command, you won’t have a copy of the image, and you can see that in the first output line: `unable to find image locally`. Then Docker downloads the image (which Docker calls “pulling”), and you can see that the image has been downloaded.
+
+Now Docker starts a container using that image. The image contains all the content for the application, along with instructions telling Docker how to start the application. The application in this image is just a simple script.
+
+And Docker images can be packaged to **run on any computer that supports Docker**, which makes the app completely portable — **portability is one of Docker’s key benefits.**
+
+Repeat the exact same Docker command: `sudo docker run hello-world`
+
+Docker already has a copy of the image locally so it doesn’t need to download the image first; it gets straight to running the container.
+
+When you use docker run the second time, it creates a second container from the same repository. This means that if you repeatedly use docker run and create a bunch of containers, you’ll need to get a list of the containers you’ve created and maybe at some point destroy them.
+
+Run and check for a container:
+- `sudo docker ps`
+- `sudo docker ps -a`
+
+Understand that the running state of a container is directly tied to the state of a single running program inside the container. **If a program is running, the container is running. If the program is stopped, the container is stopped.** Restarting a container will run the program again.
+
+Clean: `sudo docker container rm -f $(docker container ls -aq)`
+
+## Example: Running multiple NGINX instances
+1. Preverimo ali je na virtualki že zagnan Apache server:
+    - Preverimo delovanje: `curl http://127.0.0.1 ali IP virtualke`
+    - `sudo systemctl stop apache2.service`
+    - `sudo systemctl disable apache2.service`
+2. Želimo namesti in stestirati delovanje NGINX instance:
+    - `sudo apt-get update`
+    - `sudo apt-get install -y nginx`
+    - `nginx -v`
+    - `sudo systemctl start nginx`
+    - `sudo systemctl status nginx`
+    - Preverimo delovanje: `curl http://127.0.0.1 ali IP virtualke`
+3. Želimo namestiti dve instance NGINX:
+    - `sudo apt-get install nginx` - > že obstaja
+    - `sudo systemctl start nginx` -> vidmo da še vedno samo ena instanca je delujoča
+    - `sudo ps aux | grep nginx`
+    - Če želimo namestit dve instance moramo spremeniti init scripte
+        - `cat /etc/init/nginx.conf`
+    -    To je komplicirani delo, pa še skoraj nemogoče za dve različne verzije
+    - Ustavimo:
+        - `sudo systemctl stop nginx`
+        - `sudo systemctl disable nginx`
+    - Problem da ko namestimo mi eno verzijo spodaj imamo odvisnosti ki so različne od verzije. To nam kontejnerji poenostavijo.
+4.  Zaženmo NGINX s pomočjo Dockrja:
+    - NGINX DockerHub: https://hub.docker.com/_/nginx
+    - Prenesemo image lokalno (ta korak ni nujen, če slike ni se zgodi avtomatsko ob zagonu): `docker pull nginx`
+        - Uporaba default taga `latest`
+        - Zagon 1. instance: `sudo docker run -d nginx`
+        - Preverimo ali je up: `sudo docker ps`
+        - Pokažemo da se ne moremo še povezat na instanco.
+        - Zaženemo drugo in tretjo verzijo NGINXa
+            - `sudo docker run -d nginx:1.22.0`
+            - `sudo docker run -d nginx:1.14.0`
+        - Preverimo ali je up: `sudo docker ps`
+        - Pokažemo da se proces vidi na hostu: `sudo ps aux | grep nginx`
+
+> If you don't specify a name, Docker gives a container a random name, such as "stoic_williams," "sharp_bartik," "awesome_murdock," or "evil_hawking." (Stephen Hawking got no love on this one.) These are generated from a list of adjectives and names of famous scientists and hackers. The combination of the names and adjectives is random, except for one case. Want to see what the exception is? Check it out in the [Docker source code](https://github.com/docker/docker/blob/master/pkg/namesgenerator/names-generator.go)
+
+5. Izpostavimo kontejner na internet:
+    - `sudo docker run -d -p "80:80" nginx`
+    - Preverimo ali je up: `sudo docker ps`
+6. Clean: `sudo docker container rm -f $(docker container ls -aq)`
 
 
 ## TODO
 
 https://github.com/sixeyed/diamol
+

@@ -4,10 +4,11 @@
 - Docker overview
 - Why are containers and Docker so important?
 - Installing Docker
+- Running Hello World in a container
+- Example: Running multiple NGINX instances
 
 
-
-- Docker Architecture
+- TODO: Docker Architecture
 
 ## Del 2: Containers
 
