@@ -11,39 +11,45 @@
 
 ## [Del 2: Containers](./02_Containers/README.md)
 - Containers History
-- Conatiners vs Virtual Machines
+- Containers vs Virtual Machines
+- What is a container?
 
+## Del 3: Images
+- About images
+- Commands
 
-
-## Del 3: Docker Storage And Volumes
+## Del 4: Docker Storage And Volumes
 - https://docs.docker.com/storage/storagedriver/
 
-## Del 4: Docker Networking
+## Del 5: Docker Networking
 
-## Del 5: Building Images
+## Del 6: Building Images
 - Best practices for writing Dockerfiles
 - Optimizing your Docker images
 
-## Del 6: Sharing Docker Images
+## Del 7: Sharing Docker Images
 
-## Del 7: Running Multi-container Apps With Docker Compose
+## Del 8: Running Multi-container Apps With Docker Compose
 - razlika med verzijami composa in kako se inštwlira
 
-## Del 8: Docker Reliability And Health Checks
+## Del 9: Docker Reliability And Health Checks
 - Resource control
 
-## Del 9: Managing Application Logs
+## Del 10: Managing Application Logs
 
-## Del 10: Monitoring
+## Del 11: Monitoring
 - Portainer
 
-## Del 11: Docker Configuration Management
+## Del 12: Docker Configuration Management
 
-## Del 12: Docker Security
+## Del 13: Docker Security
 
-## Del 13: Advanced Docker
+## Del 14: Advanced Docker
 - Controlling HTTP traffic to containers with a reverse proxy
 - Asynchronous communication with a message queue
+
+## Del 15: Docker Exercises 
+
 
 ## Gradiva
 - [Docker Official Samples](https://docs.docker.com/samples/#tutorial-labs)
