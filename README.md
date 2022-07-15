@@ -6,11 +6,14 @@
 - Installing Docker
 - Running Hello World in a container
 - Example: Running multiple NGINX instances
-
-
-- TODO: Docker Architecture
+- Docker Architecture
+- The Docker Engine (Advanced)
 
 ## Del 2: Containers
+- Containers History
+- Conatiners vs Virtual Machines
+
+
 
 ## Del 3: Docker Storage And Volumes
 - https://docs.docker.com/storage/storagedriver/
@@ -49,6 +52,7 @@
 - https://nickjanetakis.com/blog/tag/docker-tips-tricks-and-tutorials
 - https://collabnix.com/
 
+- https://github.com/sixeyed/diamol
 
 
 # Docker

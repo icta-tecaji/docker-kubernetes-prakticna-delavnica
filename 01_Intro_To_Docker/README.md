@@ -165,8 +165,44 @@ Clean: `sudo docker container rm -f $(docker container ls -aq)`
     - Preverimo ali je up: `sudo docker ps`
 6. Clean: `sudo docker container rm -f $(docker container ls -aq)`
 
+## About Docker Company
+Docker is software that runs on Linux and Windows. It creates, manages, and can even orestrate containers. The software is currently built from various tools **from the Moby open-source project**. Docker, Inc. is the company that created the technology and continues to create technologies and solutions.
 
-## TODO
+Docker, Inc. is a San Francisco based technology company founded by French-born American developer and entrepreneur Solomon Hykes.
 
-https://github.com/sixeyed/diamol
+It’s also interesting to know that the word “Docker” comes from a British expression meaning dock worker — somebody who loads and unloads cargo from ships.
 
+## Docker Architecture
+Docker is **written in the Go programming language** and takes advantage of several features of the Linux kernel to deliver its functionality. Docker uses a technology called **namespaces** to provide the isolated workspace called the container. When you run a container, Docker creates a set of namespaces for that container.
+
+These namespaces provide a layer of isolation. Each aspect of a container runs in a separate namespace and its access is limited to that namespace.
+
+Docker uses a **client-server architecture**. 
+
+The Docker client talks to the Docker daemon, which does the heavy lifting of building, running, and distributing your Docker containers. 
+
+The Docker client and daemon can run on the same system, or you can connect a Docker client to a remote Docker daemon. The Docker client and daemon communicate using a REST API, over UNIX sockets or a network interface.
+
+In a default Linux installation, the client talks to the daemon via a local IPC/Unix socket at `/var/run/docker.sock`.
+
+Another Docker client is Docker Compose, that lets you work with applications consisting of a set of containers.
+
+![Docker Architecture](./images/img02.svg)
+<!-- Vir: https://docs.docker.com/get-started/overview/ -->
+
+A Docker registry stores Docker images. Docker Hub is a public registry that anyone can use, and Docker is configured to look for images on Docker Hub by default. You can even run your own private registry.
+
+When you use the `docker pull` or `docker run` commands, the required images are pulled from your configured registry. When you use the `docker push` command, your image is pushed to your configured registry.
+
+![Docker Architecture2](./images/img03.png)
+<!-- Vir: Docker Deep Dive, Nigel Poulton -->
+
+- The **runtime** operates at the lowest level and is responsible for starting and stopping containers (this includes building all of the OS constructs such as namespaces and cgroups). Docker implements a tiered runtime architecture with high-level and low-level runtimes that work together.
+    - The **low-level runtime** is called `runc` and is the reference implementation of Open Containers Initiative (OCI) runtime-spec. Its job is to interface with the underlying OS and start and stop containers. Every running container on a Docker node has a runc instance managing it.
+    - The **higher-level runtime** is called `containerd`. containerd does a lot more than runc. It manages the entire lifecycle of a container, including pulling images, creating network interfaces, and managing lower-level runc instances. containerd is pronounced “container-dee’ and is a graduated CNCF project used by Docker and Kubernetes as a container runtime. A typical Docker installation has a single containerd process (docker-containerd) controlling the runc (dockerrunc) instances associated with each running container.
+- The **Docker daemon** (`dockerd`) sits above containerd and performs higher-level tasks such as; exposing the Docker remote API, managing images, managing volumes, managing networks, and more… A major job of the Docker daemon is to provide an easy-to-use standard interface that abstracts the lower levels.
+- Docker also has native support for managing clusters of nodes running Docker. These clusters are called swarms and the native technology is called Docker Swarm. Docker Swarm is easy-to-use and many companies are using it in real-world production. However, most people are choosing to use Kubernetes instead of Docker Swarm.
+
+## The Docker Engine (Advanced)
+
+More [here](./The_Docker_Engine_Advanced.md).
