@@ -36,8 +36,7 @@
 
 
 
-
-
+NP DDD - 51
 
 
 
@@ -56,3 +55,5 @@
 - ugašanje kontejnerja
 - procesi v kontejnerju
 - Attaching to running containers
+
+- Starting a new container (advanced)

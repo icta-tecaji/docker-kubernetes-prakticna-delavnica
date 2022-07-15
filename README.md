@@ -104,3 +104,6 @@
 - Sharing memory
 - Understanding users
     - Working with the run-as user
+
+## Kubernetes
+- https://kubernetes.io/docs/tasks/administer-cluster/migrating-from-dockershim/check-if-dockershim-removal-affects-you/
