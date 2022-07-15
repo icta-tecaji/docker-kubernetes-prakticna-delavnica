@@ -1,6 +1,6 @@
 # Praktična delavnica Docker & Kubernetes
 
-## Del 1: Intro To Docker
+## [Del 1: Intro To Docker](./01_Intro_To_Docker/README.md)
 - Docker overview
 - Why are containers and Docker so important?
 - Installing Docker
@@ -9,7 +9,7 @@
 - Docker Architecture
 - The Docker Engine (Advanced)
 
-## Del 2: Containers
+## [Del 2: Containers](./02_Containers/README.md)
 - Containers History
 - Conatiners vs Virtual Machines
 
