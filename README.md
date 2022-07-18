@@ -13,6 +13,10 @@
 - Containers History
 - Containers vs Virtual Machines
 - What is a container?
+- Starting a simple container
+- Container processes
+- Web server example
+- Container lifecycle
 
 ## Del 3: Images
 - About images
@@ -34,6 +38,7 @@
 
 ## Del 9: Docker Reliability And Health Checks
 - Resource control
+- NP DDD - 84: Self-healing containers with restart policies
 
 ## Del 10: Managing Application Logs
 

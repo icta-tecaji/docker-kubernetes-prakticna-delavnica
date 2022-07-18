@@ -85,13 +85,162 @@ A Docker container is the same idea as a physical container — think of it like
 ![What is a container](./images/img05.png)
 <!-- Vir: Learn Docker in a Month of Lunches, ELTON STONEMAN -->
 
-Those things are all virtual resources—the hostname, IP address, and filesystem are created by Docker. They’re logical objects that are managed by Docker, and they’re all joined together to create an environment where an application can run.
+- Those things are all **virtual resources**—the hostname, IP address, and filesystem are created by Docker. They’re logical objects that are managed by Docker, and they’re all joined together to create an environment where an application can run.
+- **The application inside the box can’t see anything outside the box**, but the box is running on a computer, and that computer **can also be running lots of other boxes**.
+- The applications in those boxes have their own separate environments (managed by Docker), but they **all share the CPU and memory of the computer**, and they all **share the computer’s operating system**.
 
+![Mulitple containers](./images/img06.png)
+<!-- Vir: Learn Docker in a Month of Lunches, ELTON STONEMAN -->
 
+It fixes two conflicting problems in computing: 
+- **Density**
+    - Density means running as many applications on your computers as possible, to utilize all the processor and memory that you have.
+- **Isolation**
+    - Applications really need to be isolated from each other, and that stops you running lots of them on a single computer, so you don’t get density.
 
+## Starting a simple container
 
-ES - 18
-NP DDD - 73, 77
+The simplest way to start a container is with the `docker container run` command. The following command starts a simple container that will run a containerized version of Ubuntu Linux. You can run a container and connect to a terminal inside the container, just as if you were connecting to a remote machine.
+
+- `sudo docker run -it ubuntu:latest /bin/bash`
+
+same as
+
+- `sudo docker container run --interactive --tty ubuntu:latest /bin/bash`
+
+The `--interactive` or `-i` flag tells Docker you want to set up a connection to the container, and the `--tty` or `t` flag means you want to connect to a terminal session inside the container. `/bin/bash` is the application the container will run.
+
+The output will show Docker pulling the image, and then you’ll be left with a
+command prompt. That command prompt is for a terminal session inside the container.
+
+> [NARIŠEMO] When you hit Return, the Docker client packaged up the command and POSTed it to the API server running on the Docker daemon. The Docker daemon accepted the command and searched the Docker host’s local image repository to see if it already had a copy of the requested image. It didn’t, so it went to Docker Hub to see if it could find it there. It found it, pulled it locally, and stored it in its local cache. Once the image was pulled, the daemon instructed containerd and runc to create and start the container.
+
+Either way, you’re now inside the container and you can run any commands that you can normally run in the command line for the operating system. Run the commands hostname and date and you’ll see details of
+the container’s environment:
+- `hostname` (first 12 characters of the container’s unique ID)
+- `date`
+
+Try executing some basic commands inside of the container. You might notice that some of them don’t work. This is because the **images are optimized to be lightweight**. As a result, they don’t have all of the normal commands
+and packages installed. The following example shows a couple of commands — one succeeds and the other one fails.
+- `ls -l`
+- `ping google.com`
+
+As you can see, the ping utility is not included as part of the official Ubuntu image. We can install the command:
+- `apt update`
+- `apt install -y iputils-ping`
+- `ping google.com`
+
+Open up a new terminal session, and you can **get details of all the running containers** with this command: `sudo docker container ls`
+
+The output shows you information about each container, including the image it’s using, the container ID, and the command Docker ran inside the container when it started.
+
+`docker container top` lists the processes running in the container.
+- `sudo docker container top <CONTAINER ID or NAME>`
+
+If you have multiple processes running in the container, Docker will show them all.
+
+- `docker container logs` displays any log entries the container has collected:
+- `sudo docker container logs <CONTAINER ID or NAME>`
+
+Docker collects log entries using the output from the application in the container. In the case of this terminal session, I see the commands I ran and their results, but for a **real application you would see your code’s log entries**. For example, a web application may write a log entry for every HTTP request processed, and these will show in the container logs.
+
+`docker container inspect` shows you all the details of a container:
+- `sudo docker container inspect <CONTAINER ID or NAME>`
+
+The full output shows lots of low-level information, including the paths of the container’s virtual filesystem, the command running inside the container, and the virtual Docker network the container is connected to—this can all be useful if you’re tracking down a problem with your application. It comes as a large chunk of JSON, which is great for automating with scripts. 
+
+## Container processes
+When we started the Ubuntu container, we told it to run the Bash shell (/bin/bash). This makes the Bash shell the **one and only process running** inside of the container. You can see this by running `ps -elf` from inside the container.
+- Run inside the container: `ps -elf`
+
+The first process in the list, with PID 1, is the Bash shell we told the container to run. The second process is the `ps -elf` command we ran to produce the list. This is a **short-lived process that exits as soon as the output is displayed**. Long story short, this container is running a single process — `/bin/bash`.
+
+If you’re logged on to the container and type exit, you’ll terminate the Bash process and the container will exit (terminate). This is because a container cannot exist without its designated main process. This is true of Linux and Windows containers — **killing the main process in the container will kill the container**.
+
+Press `Ctrl-PQ` to **exit the container without terminating its main process**. Doing this will place you back in the shell of your Docker host and leave the container running in the background. You can use the `docker container ls` command to view the list of running containers on your system.
+
+It’s important to understand that **this container is still running and you can re-attach your terminal to it with**: the `docker container attach` command.
+- `sudo docker attach <CONTAINER ID or NAME>`
+- Run inside the container: `ps -elf` (we see one bash shell)
+- Press `Ctrl-PQ`
+
+Re-attach your terminal to it with the `docker container exec` command.
+- `sudo docker container exec -it <CONTAINER ID or NAME> bash`
+- Run inside the container: `ps -elf` (we see two bash shells)
+
+As you can see, the shell prompt has changed bach to the container. If you run the `ps -elf` command again you will now see two Bash or PowerShell processes. This is because the **docker container exec command created
+a new Bash or PowerShell process** and attached to that. **This means typing exit in this shell will not terminate the container**, because the original Bash or PowerShell process will continue running.
+- `exit`
+- `sudo docker container ls`
+
+If you are following along with the examples, you should stop and delete the container with the following two commands (you will need to substitute the ID of your container).
+- `sudo docker container stop <CONTAINER ID or NAME>`
+- `sudo docker container ls -a`
+
+The containers have the status Exited. There are a couple of key things to understand here. First, containers are running only while the application inside the container is running. As soon as the application process ends, the container goes into the exited state. **Exited containers don’t use any CPU time or memory.**
+
+Second, **containers don’t disappear when they exit**. Containers in the exited state still exist, which means you can start them again, check the logs, and copy files to and from the container’s filesystem. Exited containers still **take up space on disk** because their filesystem is kept on the computer’s disk. Remove the container:
+- `sudo docker container rm <CONTAINER ID or NAME>`
+
+## Web server example
+So what about starting containers that stay in the background and just keep running? That’s actually the main use case for Docker: running server applications like websites, batch processes, and databases.
+
+Here’s a simple example, running a website in a container:
+- `sudo docker container run --detach --publish 8088:80 nginx:1.23.0`
+
+This time the only output you’ll see is a long container ID, and you get returned to your command line. The **container is still running in the background**.
+
+Run `docker container ls` and you’ll see that the new container has the status Up:
+- `sudo docker container ls`
+
+When you run this container, you have a full web server running, hosting a custom website. Containers that sit in the background and listen for network traffic (HTTP requests in this case) need a couple of extra flags in the container run command:
+- `--detach` or `-d` — Starts the container in the background and shows the container ID
+- `--publish` or `-p` — Publishes a port from the container to the computer
+
+When building a Doer image, you can embed an instruction that lists the default app for any containers that
+use the image. You can see this for any image by running a `docker image inspect`.
+- `sudo docker image inspect nginx:1.23.0`
+
+The entries after Cmd show the **command/app that the container will run unless you override it with a different one when you launch the container with docker container run**.
+It’s common to build images with default commands like this, as it makes starting containers easier. It also forces a default behavior and is a form of self documentation — i.e. you can inspect the image and know what app it’s designed to run.
+
+Running a detached container just puts the container in the background so it starts up and stays hidden, like a Linux daemon or a Windows service.
+
+When you install Docker, it injects itself into your computer’s networking layer. Traffic coming into your computer can be intercepted by Docker, and then Docker can send that traffic into a container. **Containers aren’t exposed to the outside world by default.**
+
+**Each has its own IP address**, but that’s an IP address that Docker creates for a network that Docker manages — **the container is not attached to the physical network of the computer.**
+
+Publishing a container port means Docker listens for network traffic on the computer port, and then sends it into the container. In the preceding example, traffic sent to the computer on port 8088 will get sent into the container on port 80.
+
+![Ports](./images/img07.png)
+<!-- Vir: Learn Docker in a Month of Lunches, ELTON STONEMAN -->
+
+In this example my computer is the machine running Docker, and it has the IP
+address 192.168.2.150. That’s the IP address for my physical network, and it was
+assigned by the router when my computer connected. Docker is running a single container on that computer, and the container has the IP address 172.0.5.1. That
+address is assigned by Docker for a virtual network managed by Docker. No other computers in my network can connect to the container’s IP address, because it only exists in Docker, but they can send traffic into the container, because the port has been published.
+
+Browse to `http://<IP>:8088` on a browser. That’s an HTTP request to the local computer, but the response (see figure 2.7) comes from the container.
+
+A web developer can run a single container on their laptop, and the whole application—from the HTML to the web server stack— will be exactly the same as if an operator ran the app on 100 containers across a server cluster in production.
+
+The **application in this container keeps running indefinitely, so the container will keep running too**. You can use the `docker container` commands we’ve already used to manage it.
+
+`docker container stats` is another useful one: it shows a live view of how much CPU, memory, network, and disk the container is using.
+- `sudo docker container stats <CONTAINER ID or NAME>`
+
+When you’re done working with a container, **you can remove** it with `docker container rm` and the container ID, using the `--force` or `-f` flag to force removal if the container is still running.
+- `sudo docker container rm -f $(docker container ls -aq)`
+
+The `$()` syntax sends the output from one command into another command — it works just as well on Linux and Mac terminals, and on Windows PowerShell. Combining these commands gets a list of all the container IDs on your computer, and **removes them all**.
+
+## Container lifecycle
+
+- Stopping containers gracefully
+- Vaja spremnijo spletno stran na NGINX: https://github.com/sixeyed/diamol/tree/master/ch02/lab
+
+ES - 31
+NP DDD - 73, 81
 
 
 
@@ -108,7 +257,6 @@ NP DDD - 73, 77
 
 
 - ugašanje kontejnerja
-- procesi v kontejnerju
 - Attaching to running containers
 
 - Starting a new container (advanced)
