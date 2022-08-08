@@ -16,7 +16,9 @@
 - Starting a simple container
 - Container processes
 - Web server example
-- Container lifecycle
+- Exploring the container filesystem and the container lifecycle
+- Stopping containers gracefully
+
 
 ## Del 3: Images
 - About images

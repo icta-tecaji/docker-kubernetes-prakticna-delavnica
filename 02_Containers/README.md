@@ -197,11 +197,11 @@ When you run this container, you have a full web server running, hosting a custo
 - `--detach` or `-d` — Starts the container in the background and shows the container ID
 - `--publish` or `-p` — Publishes a port from the container to the computer
 
-When building a Doer image, you can embed an instruction that lists the default app for any containers that
-use the image. You can see this for any image by running a `docker image inspect`.
+When building a Docker image, you can embed an instruction that lists the default app for any containers that use the image. You can see this for any image by running a `docker image inspect`.
 - `sudo docker image inspect nginx:1.23.0`
 
 The entries after Cmd show the **command/app that the container will run unless you override it with a different one when you launch the container with docker container run**.
+
 It’s common to build images with default commands like this, as it makes starting containers easier. It also forces a default behavior and is a form of self documentation — i.e. you can inspect the image and know what app it’s designed to run.
 
 Running a detached container just puts the container in the background so it starts up and stays hidden, like a Linux daemon or a Windows service.
@@ -216,9 +216,7 @@ Publishing a container port means Docker listens for network traffic on the comp
 <!-- Vir: Learn Docker in a Month of Lunches, ELTON STONEMAN -->
 
 In this example my computer is the machine running Docker, and it has the IP
-address 192.168.2.150. That’s the IP address for my physical network, and it was
-assigned by the router when my computer connected. Docker is running a single container on that computer, and the container has the IP address 172.0.5.1. That
-address is assigned by Docker for a virtual network managed by Docker. No other computers in my network can connect to the container’s IP address, because it only exists in Docker, but they can send traffic into the container, because the port has been published.
+address 192.168.2.150. That’s the IP address for my physical network, and it was assigned by the router when my computer connected. Docker is running a single container on that computer, and the container has the IP address 172.0.5.1. That address is assigned by Docker for a virtual network managed by Docker. No other computers in my network can connect to the container’s IP address, because it only exists in Docker, but they can send traffic into the container, because the port has been published.
 
 Browse to `http://<IP>:8088` on a browser. That’s an HTTP request to the local computer, but the response (see figure 2.7) comes from the container.
 
@@ -234,13 +232,60 @@ When you’re done working with a container, **you can remove** it with `docker 
 
 The `$()` syntax sends the output from one command into another command — it works just as well on Linux and Mac terminals, and on Windows PowerShell. Combining these commands gets a list of all the container IDs on your computer, and **removes them all**.
 
-## Container lifecycle
+## Exploring the container filesystem and the container lifecycle
+We will replace the `index.html` file so when you browse to the container you see a different homepage. Remember that the **container has its own filesystem**, and in this application, the website is serving files that are on the container’s filesystem.
 
-- Stopping containers gracefully
-- Vaja spremnijo spletno stran na NGINX: https://github.com/sixeyed/diamol/tree/master/ch02/lab
+1. Run the NGINX web container: `sudo docker container run --name my-nginx -d -p 8080:80 nginx:latest`
+2. Note down the start of the container ID so you can work with the container. You can also use the container name.
+3. Check if the webpage is working. 
+4. Check the HTML page in the container is in the [expected location](https://hub.docker.com/_/nginx/) (check the documentation): `sudo docker container exec my-nginx ls /usr/share/nginx/html`
+5. We know where the HTML file is inside the container, so we can use `docker container cp` to **copy a local file into the container**. This will overwrite the index.html file in the container with the file in my current directory: 
+    - Create a `index.html` file locally with some HTML content.
+    - Copy the file: `sudo docker container cp index.html my-nginx:/usr/share/nginx/html/index.html`. The format of the cp command is `[source path] [target path]`. The container can be the source or the target, and you prefix the container file path with the container ID or name.
+    - Refresh the webpage. 
+    - Inside the container the web server returns the contents of the HTML file at the known location. Here we've overwritten the file inside the container with a new file from the local machine. Now when NGINX serves the page, it's the new content.
+6. Change the web content directly from the container.
+    - Attach to the container: `sudo docker exec -it my-nginx /bin/bash`
+    - Inside the container run:
+        - Move to data folder: `cd /usr/share/nginx/html`
+        - Install nano: `apt install` and `apt install -y nano`
+        - Change the file: `nano index.html`
+        - Refresh the webpage.
+        - Exit the container `exit`.
+7. We haven't changed the files in the Docker image though, only in this one container. **If you remove the container and start a new one, you'll see it shows the original HTML page**.
+    - Stop the container: `sudo docker stop my-nginx`
+    - Now we can see the container showing as Exited (0). Stopping a container is like stopping a virtual machine. Although it’s not currently running, its entire configuration and contents still exist on the local filesystem of the Docker host. This means it can be restarted at any time.
+    - List all running containers: `sudo docker ps`. 
+    - The container is not listed in the output above because it’s in the stopped state. Run the same command again, only this time add the -a flag to show all containers, including those that are stopped: `sudo docker ps -a`
+    - Run the container: `sudo docker start my-nginx`.
+    - The stopped container is now restarted. Time to verify that the file we created earlier still exists. Refresh the page.
+        - The data created in this example is stored on the Docker hosts local filesystem. **If the Docker host fails, the data will be lost.**
+        - **Containers are designed to be immutable objects** and it’s not a good practice to write data to them.
+    - Now let’s kill the container and delete it from the system: `sudo docker rm -f my-nginx`
+    - You can stop, start, pause, and restart a container as many times as you want. It’s not until you explicitly delete a container that you run a chance of losing its data.
+    - Run a new container: `sudo docker container run --name my-nginx -d -p 8080:80 nginx:latest`
+    - Refresh. We get the original contnet.
+    - Stop and remove the container: `sudo docker rm -f my-nginx`
+
+## Stopping containers gracefully
+
+Most containers in the Linux world **will run a single process**. When you kill a running container with `docker container rm <container> -f`, **the container is killed without warning**. The procedure is quite violent — a bit like sneaking up behind the container and shooting it in the back of the head. You’re literally giving the container, and the app it’s running, no chance to complete any operation and gracefully exit.
+
+However, the `docker container stop` command is far more polite — like pointing a gun to the containers head and saying “you’ve got 10 seconds to say any final words”. It **gives the process inside of the container a heads-up that it’s about to be stopped**, giving it a chance to get things in order before the end comes. Once the it completes, you can then delete the container with docker container rm.
+
+The magic behind the scenes here can be explained with **Linux/POSIX signals**. `docker container stop` sends a `SIGTERM` signal to the main application process inside the container (PID 1). As we said, this gives the process a chance to clean things up and gracefully shut itself down. 
+
+If it doesn’t exit within 10 seconds, it will receive a `SIGKILL`. This is effectively the bullet to the head. But hey, it got 10 seconds to sort itself out first. 
+
+`docker container rm <container> -f` doesn’t bother asking nicely with a SIGTERM, it goes straight to the `SIGKILL`.
+
+
+
+
+
 
 ES - 31
-NP DDD - 73, 81
+NP DDD - 91
 
 
 
@@ -255,8 +300,5 @@ NP DDD - 73, 81
 
 
 
-
-- ugašanje kontejnerja
-- Attaching to running containers
 
 - Starting a new container (advanced)
