@@ -278,27 +278,3 @@ The magic behind the scenes here can be explained with **Linux/POSIX signals**. 
 If it doesn’t exit within 10 seconds, it will receive a `SIGKILL`. This is effectively the bullet to the head. But hey, it got 10 seconds to sort itself out first. 
 
 `docker container rm <container> -f` doesn’t bother asking nicely with a SIGTERM, it goes straight to the `SIGKILL`.
-
-
-
-
-
-
-ES - 31
-NP DDD - 91
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-- Starting a new container (advanced)

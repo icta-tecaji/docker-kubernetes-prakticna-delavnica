@@ -19,12 +19,15 @@
 - Exploring the container filesystem and the container lifecycle
 - Stopping containers gracefully
 
+## [Del 3: Docker Images](./03_Docker_Images/README.md)
+- About Docker Images
+- Images are usually small
+- Pulling images
+- Image registries
+- Image naming and tagging
+- Filtering the images on the host
 
-## Del 3: Images
-- About images
-- Commands
-
-## Del 4: Docker Storage And Volumes
+## [Del 4: Docker Storage And Volumes](./04_Docker_Storage_And_Volumes/README.md)
 - https://docs.docker.com/storage/storagedriver/
 
 ## Del 5: Docker Networking
