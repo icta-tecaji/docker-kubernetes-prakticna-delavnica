@@ -30,6 +30,13 @@
 - Deleting Images
 
 ## [Del 4: Docker Storage And Volumes](./04_Docker_Storage_And_Volumes/README.md)
+- Introduction to Docker Storage And Volumes
+- Containers and non-persistent data
+- Running containers with Docker volumes
+
+
+
+
 - https://docs.docker.com/storage/storagedriver/
 - https://docs.docker.com/storage/volumes/
 
