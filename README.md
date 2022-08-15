@@ -26,17 +26,24 @@
 - Image registries
 - Image naming and tagging
 - Filtering the images on the host
+- Images and layers
+- Deleting Images
 
 ## [Del 4: Docker Storage And Volumes](./04_Docker_Storage_And_Volumes/README.md)
 - https://docs.docker.com/storage/storagedriver/
+- https://docs.docker.com/storage/volumes/
 
 ## Del 5: Docker Networking
 
 ## Del 6: Building Images
 - Best practices for writing Dockerfiles
 - Optimizing your Docker images
+- https://docs.docker.com/develop/develop-images/build_enhancements/
 
 ## Del 7: Sharing Docker Images
+- https://docs.docker.com/get-started/04_sharing_app/
+- Searching Docker Hub from the CLI (NP-59)
+- Pulling images by digest (NP - 65)
 
 ## Del 8: Running Multi-container Apps With Docker Compose
 - razlika med verzijami composa in kako se inštwlira
@@ -56,7 +63,10 @@
 
 ## Del 14: Advanced Docker
 - Controlling HTTP traffic to containers with a reverse proxy
+- Multi-architecture images (NP - 67)
 - Asynchronous communication with a message queue
+- https://medium.com/@saschagrunert/demystifying-containers-part-i-kernel-space-2c53d6979504
+
 
 ## Del 15: Docker Exercises 
 
@@ -73,10 +83,7 @@
 
 # Docker
 - zakaj docker (lažja inštalacija) - se pokaže primer
-- kaj je docker
-- namestitev
-- hello world image
-	- tukaj se nariše shema kaj se zgodi, malo pokaže komponente, dockerhub
+
 - kaj je container
 	- namespacing
 	- control group
