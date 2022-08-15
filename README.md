@@ -53,6 +53,7 @@
 - NP DDD - 84: Self-healing containers with restart policies
 
 ## Del 10: Managing Application Logs
+- https://sematext.com/guides/docker-logs/
 
 ## Del 11: Monitoring
 - Portainer
