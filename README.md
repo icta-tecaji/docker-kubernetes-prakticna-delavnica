@@ -33,10 +33,6 @@
 - Introduction to Docker Storage And Volumes
 - Containers and non-persistent data
 - Running containers with Docker volumes
-
-
-
-
 - https://docs.docker.com/storage/storagedriver/
 - https://docs.docker.com/storage/volumes/
 
@@ -68,6 +64,8 @@
 ## Del 12: Docker Configuration Management
 
 ## Del 13: Docker Security
+- Container security
+- Container scanning
 
 ## Del 14: Advanced Docker
 - Controlling HTTP traffic to containers with a reverse proxy
