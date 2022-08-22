@@ -33,15 +33,26 @@
 - Introduction to Docker Storage And Volumes
 - Containers and non-persistent data
 - Running containers with Docker volumes
-- https://docs.docker.com/storage/storagedriver/
-- https://docs.docker.com/storage/volumes/
+- Creating and managing Docker volumes
+- Demonstrating volumes with containers and services
+- Populate a volume using a container
+- Use a read-only volume
+- Share data between Docker containers
+- Use a third party volume driver (Advanced)
+- Running containers with filesystem mounts (Bind mounts)
+- Limitations of filesystem mounts
+- Understanding how the container filesystem is built (Advanced)
+- Use tmpfs mounts (Advanced)
+- Choose the right type of mount
+- Example: Run a PostgreSQL database
 
-## Del 5: Docker Networking
+## [Del 5: Docker Networking](./05_Docker_Networking/README.md)
 
-## Del 6: Building Images
+## [Del 6: Building Images](./06_Building_Images/README.md)
 - Best practices for writing Dockerfiles
 - Optimizing your Docker images
 - https://docs.docker.com/develop/develop-images/build_enhancements/
+- pkažemo volume ukaz, da ustvari volumen -> ES 80
 
 ## Del 7: Sharing Docker Images
 - https://docs.docker.com/get-started/04_sharing_app/

@@ -8,6 +8,13 @@
 https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#dockerfile-instructions
 
 
+## VOLUME command
+However, it’s also possible to deploy volumes via Doerfiles using the VOLUME instruction. The format is VOLUME `<container-mount-point>`. Interestingly, you cannot specify a directory on the host when defining a volume in a Dockerfile. is is because host directories are different depending on what OS your Doer host is running
+– it could break your builds if you specified a directory on a Doer host that doesn’t exist. As a result, defining
+a volume in a Doerfile requires you to specify host directories at deploy-time.
+
+Anonymous volumes have no specific source so when the container is deleted, instruct the Docker Engine daemon to remove them.
+- https://docs.docker.com/storage/volumes/#remove-anonymous-volumes
 
 ## Best practices for writing Dockerfiles
 
