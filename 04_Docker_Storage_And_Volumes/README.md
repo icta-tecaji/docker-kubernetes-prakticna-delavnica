@@ -149,16 +149,49 @@ Stop the container and remove the volume. Note volume removal is a separate step
 - `sudo docker volume rm server-data`
 
 ## Populate a volume using a container
-- https://docs.docker.com/storage/volumes/#populate-a-volume-using-a-container
+If you start a container which creates a new volume and the container has files or directories in the directory to be mounted, the **directory’s contents are copied into the volume**. The container then mounts and uses the volume, and other containers which use the volume also have access to the pre-populated content.
+
+To illustrate this, this example starts an nginx container and populates the new volume `nginx-vol` with the contents of the container’s `/usr/share/nginx/html` directory, which is where Nginx stores its default HTML content.
+- `sudo docker run -d --name=nginxtest -v nginx-vol:/usr/share/nginx/html nginx:latest`
+- `sudo docker exec -it nginxtest /bin/bash`
+- `ls /usr/share/nginx/html`
+- `exit`
+- `sudo docker container rm -f nginxtest`
+- `sudo docker volume rm nginx-vol`
 
 ## Use a read-only volume
-- https://docs.docker.com/storage/volumes/#use-a-read-only-volume
+For some development applications, the container needs to write into the bind mount so that changes are propagated back to the Docker host. At other times, the **container only needs read access to the data**. Remember that multiple containers can mount the same volume, and it can be mounted read-write for some of them and read-only for others, at the same time.
+
+This example modifies the one above but **mounts the directory as a read-only volume**, by adding `ro` to the (empty by default) list of options, after the mount point within the container. 
+- `sudo docker run -d --name=nginxtest -v nginx-vol:/usr/share/nginx/html:ro nginx:latest`
+- `sudo docker inspect nginxtest`
+- `sudo docker exec -it nginxtest /bin/bash`
+- `cd /usr/share/nginx/html`
+- `touch test` -> touch: cannot touch 'test': Read-only file system
+- `exit`
+- `sudo docker container rm -f nginxtest`
+- `sudo docker volume rm nginx-vol`
 
 ## Share data between Docker containers
-- Potential data corruption NP - 198
+A **major concern** with any configuration that shares a **single volume among multiple containers is data corruption**.
+
+The application running in `ctr-1` updates some data in the shared volume. However, instead of writing the update directly to the volume, it holds it in its local buffer for faster recall (this is common in many operating systems). At this point, the application in `ctr-1` thinks the data has been written to the volume. However, before `ctr-1` flushes its buffers and commits the data to the volume, the app in `ctr-2` updates the same data with a different value and commits it directly to the volume. At this point, both applications think they’ve updated the data in the volume, but in reality only the application in `ctr-2` has. A few seconds later, `ctr-1` flushes the data to the volume, overwriting the changes made by the application in `ctr-2`. However, the application in `ctr-2` is totally unaware of this! 
+
+To prevent this, you need to write your applications in a way to avoid things like this.
+
+Example of sharing a volume:
+- `sudo docker run -d --name=nginxtest -p 80:80 -v nginx-vol:/usr/share/nginx/html:ro nginx:latest`
+- `sudo docker run -d --name=nginxtest -v nginx-vol:/web-data busybox:latest sleep 5000`
+- `sudo docker exec -it downloader /bin/sh`
+- `cd web-data`
+- `wget https://example.com/ -O index.html`
+- `wget https://www.iana.org/domains/reserved -O index.html`
+- `exit`
+- `sudo docker rm -f nginxtest downloader`
+- `sudo docker volume rm nginx-vol`
 
 ## Use a third party volume driver (Advanced)
-- NP - 196 (Sharing storage across cluster nodes)
+More [here](./Use_a_third_party_volume_driver_Advanced.md).
 
 ## Running containers with filesystem mounts (Bind mounts)
 
@@ -171,18 +204,46 @@ A bind mount **makes a directory on the host available as a path on a container*
 - ES 85
 - primer z NGINX iz starih gradiv
 
+> **Bind mounts allow access to sensitive files** One side effect of using bind mounts, for better or for worse, is that you can change the host filesystem via processes running in a container, including creating, modifying, or deleting important system files or directories. This is a powerful ability which can have security implications, including impacting non-Docker processes on the host system.
+
 ## Limitations of filesystem mounts
 - https://docs.docker.com/storage/bind-mounts/#mount-into-a-non-empty-directory-on-the-container
 - ES 88
 
 ## Understanding how the container filesystem is built (Advanced)
- - ES - 92
+More [here](./Understanding_how_the_container_filesystem_is_built_Advanced.md).
 
 ## Use tmpfs mounts (Advanced)
-- https://docs.docker.com/storage/tmpfs/
+More [here](./Use_tmpfs_mounts_Advanced.md).
 
 ## Choose the right type of mount
-- https://docs.docker.com/storage/
+No matter which type of mount you choose to use, the data looks the same from within the container. It is exposed as either a directory or an individual file in the container’s filesystem.
+
+An easy way to visualize the difference among volumes, bind mounts, and tmpfs mounts is to think about where the data lives on the Docker host.
+
+![visualize the difference among volumes](./images/img05.png)
+<!-- Vir: https://docs.docker.com/storage/ -->
+
+- **Volumes** are stored in a part of the host filesystem which is managed by Docker (`/var/lib/docker/volumes/` on Linux). Non-Docker processes should not modify this part of the filesystem. Volumes are the best way to persist data in Docker.
+- **Bind mounts** may be stored anywhere on the host system. They may even be important system files or directories. Non-Docker processes on the Docker host or a Docker container can modify them at any time.
+- **tmpfs mounts** are stored in the host system’s memory only, and are never written to the host system’s filesystem.
+
+### Good use cases for volumes
+Volumes are the preferred way to persist data in Docker containers and services. Some use cases for volumes include:
+- Sharing data among multiple running containers.
+- When the Docker host is not guaranteed to have a given directory or file structure. Volumes help you decouple the configuration of the Docker host from the container runtime.
+- When you want to store your container’s data on a remote host or a cloud provider, rather than locally.
+- When you need to back up, restore, or migrate data from one Docker host to another, volumes are a better choice.
+
+### Good use cases for bind mounts
+In general, you should use volumes where possible. Bind mounts are appropriate for the following types of use case:
+- **Sharing configuration files** from the host machine to containers. This is how Docker provides DNS resolution to containers by default, by mounting `/etc/resolv.conf` from the host machine into each container.
+- **Sharing source code** or build artifacts between a **development environment** on the Docker host and a container.
+- When the file or directory structure of the Docker host is guaranteed to be consistent with the bind mounts the containers require.
+
+### Good use cases for tmpfs mounts
+- tmpfs mounts are best used for cases **when you do not want the data to persist either on the host machine or within the container**. This may be for security reasons or to protect the performance of the container when your application needs to write a large volume of non-persistent state data.
+
 
 ## Example: Run a PostgreSQL database
 - https://hub.docker.com/_/postgres/

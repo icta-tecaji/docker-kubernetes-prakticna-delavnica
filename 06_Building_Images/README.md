@@ -16,6 +16,8 @@ a volume in a Doerfile requires you to specify host directories at deploy-tim
 Anonymous volumes have no specific source so when the container is deleted, instruct the Docker Engine daemon to remove them.
 - https://docs.docker.com/storage/volumes/#remove-anonymous-volumes
 
+When you mount a volume, it may be named or anonymous. Anonymous volumes are not given an explicit name when they are first mounted into a container, so Docker gives them a random name that is guaranteed to be unique within a given Docker host. Besides the name, named and anonymous volumes behave in the same ways.
+
 ## Best practices for writing Dockerfiles
 
 [More here](./Best_practices_for_writing_Dockerfiles/Best_practices_for_writing_Dockerfiles.md).
