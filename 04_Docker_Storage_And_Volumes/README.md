@@ -199,16 +199,72 @@ Docker also provides a **more direct way of sharing storage** between containers
 
 A bind mount **makes a directory on the host available as a path on a container**. The bind mount is transparent to the container—it’s just a directory that is part of the container’s filesystem. But it means you can access host files from a container and vice versa, which unlocks some interesting patterns.
 
-- https://docs.docker.com/storage/bind-mounts/
-- https://docs.docker.com/storage/bind-mounts/#use-a-read-only-bind-mount
-- ES 85
-- primer z NGINX iz starih gradiv
+> Documentation: [Use bind mounts](https://docs.docker.com/storage/bind-mounts/).
+
+**Bind mounts let you explicitly use the filesystems on your host machine** for container data. That could be:
+- a fast solid-state disk, 
+- a highly available array of disks, 
+- or even a distributed storage system that’s accessible across your network. 
+
+If you can access that filesystem on your host, you can use it for containers.
+
+We are **running a web server** that depends on **sensitive configuration** on the host and emits **access logs** that need to be forwarded by your log-shipping system. You could use Docker to launch the web server in a container and bind-mount the configuration location as well as the location where you want the web server to write logs.
+- `cd 04_Docker_Storage_And_Volumes`
+- `cat examples/01_nginx/example.conf`
+
+Once a server is started with this configuration file, it will offer the NGINX default site, and access logs for that site will be written to a file in the container at `/var/log/nginx/custom.host.access.log`. The following command will start an NGINX HTTP server in a container where your new configuration is bind-mounted to the server’s configuration root:
+- `CONF_SRC=$(pwd)/examples/01_nginx/example.conf`
+- `LOGS_SRC=$(pwd)/examples/01_nginx/example.log`
+- `touch $LOGS_SRC`
+
+In general, `--mount` is more explicit and verbose. New users should use the `--mount` syntax.
+- The **type** of the mount, which can be `bind`, `volume`, or `tmpfs`.
+- The **source** of the mount. For bind mounts, this is the path to the file or directory on the Docker daemon host. May be specified as `source` or `src`.
+- The **destination** takes as its value the path where the file or directory is mounted in the container. May be specified as `destination`, `dst`, or `target`.
+```bash
+sudo docker run -d --name my-server \
+        --mount type=bind,source=${CONF_SRC},target=/etc/nginx/conf.d/default.conf \
+        --mount type=bind,source=${LOGS_SRC},target=/var/log/nginx/custom.host.access.log \
+        -p 80:80 \
+        nginx:latest
+```
+The bind mount is **bidirectional**. You can create files in the container and edit them on the host, or create files on the host and edit them in the container.
+- `sudo docker rm -f my-server`
+
+Expanding on this use case, suppose you want to make sure that the NGINX web
+server **can’t change the contents of the configuration volume**. Even the most trusted software can contain vulnerabilities, and it’s best to minimize the impact of an attack on your website. If you don’t need to write files, you can bind mount the host directory as **read-only inside the container**. This is one option for surfacing configuration settings from the host into the application container.
+
+```bash
+sudo docker run -d --name my-server \
+        --mount type=bind,source=${CONF_SRC},target=/etc/nginx/conf.d/default.conf,readonly \
+        --mount type=bind,source=${LOGS_SRC},target=/var/log/nginx/custom.host.access.log \
+        -p 80:80 \
+        nginx:latest
+```
+You can bind-mount any source that your host computer has access to.
+- `sudo docker rm -f my-server`
 
 > **Bind mounts allow access to sensitive files** One side effect of using bind mounts, for better or for worse, is that you can change the host filesystem via processes running in a container, including creating, modifying, or deleting important system files or directories. This is a powerful ability which can have security implications, including impacting non-Docker processes on the host system.
 
+Bind mounts have limited functionality compared to volumes. When you use a bind mount, a file or directory on the host machine is mounted into a container. The file or directory is referenced by its absolute path on the host machine. If a container description depends on content at a specific location on the host filesystem, that description **isn’t portable to hosts where the content is unavailable or available in some other location**.
+
 ## Limitations of filesystem mounts
-- https://docs.docker.com/storage/bind-mounts/#mount-into-a-non-empty-directory-on-the-container
-- ES 88
+
+**What happens when you run a container with a mount, and the mount target directory already exists and has files from the image layers?**
+- When you mount a target that already has data, the source directory replaces the target directory  — so the **original files from the image are not available.**
+- `sudo docker run -d --name no-mount nginx:latest`
+- `sudo docker exec no-mount ls -la /usr/share/nginx/html`
+- `CONF_SRC=$(pwd)/examples/02_mount_folder`
+- `sudo docker run -d --name mount --mount type=bind,source=${CONF_SRC},target=/usr/share/nginx/html nginx:latest`
+- `sudo docker exec mount ls -la /usr/share/nginx/html`
+- `sudo docker rm -f mount no-mount`
+
+**What happens if you mount a single file from the host to a target directory that exists in the container filesystem?**
+- This time the directory contents are merged, so you’ll see the original files from the image and the new file from the host.
+- `CONF_SRC=$(pwd)/examples/02_mount_folder/test.html`
+- `sudo docker run -d --name mount --mount type=bind,source=${CONF_SRC},target=/usr/share/nginx/html/test.html nginx:latest`
+- `sudo docker exec mount ls -la /usr/share/nginx/html`
+- `sudo docker rm -f mount`
 
 ## Understanding how the container filesystem is built (Advanced)
 More [here](./Understanding_how_the_container_filesystem_is_built_Advanced.md).
@@ -246,6 +302,25 @@ In general, you should use volumes where possible. Bind mounts are appropriate f
 
 
 ## Example: Run a PostgreSQL database
-- https://hub.docker.com/_/postgres/
-- ES - 93 Lab
 
+Run the [postgres](https://hub.docker.com/_/postgres/) container. PostgreSQL, often simply "Postgres", is an object-relational database management system (ORDBMS) with an emphasis on extensibility and standards-compliance. As a database server, its primary function is to store data, securely and supporting best practices, and retrieve it later, as requested by other software applications, be it those on the same computer or those running on another computer across a network (including the Internet). It can handle workloads ranging from small single-machine applications to large Internet-facing applications with many concurrent users. Recent versions also provide replication of the database itself for security and scalability.
+
+- `CONF_PATH=$(pwd)/examples/03_postgres/my-postgres.conf`
+- `sudo docker volume create pgdata`
+```bash
+sudo docker run -d --name my-database \
+        --mount type=bind,source=${CONF_PATH},target=/etc/postgresql/postgresql.conf,readonly \
+        -v pgdata:/var/lib/postgresql/data \
+        -e POSTGRES_USER=test \
+        -e POSTGRES_PASSWORD=mojegeslo \
+        -e POSTGRES_DB=test \
+        postgres -c 'config_file=/etc/postgresql/postgresql.conf'
+```
+- `sudo docker exec -it my-database psql -U test`
+- `\l`
+- `\c test`
+- `CREATE TABLE PODATKI(ID INT);`
+- `\dt`
+- `exit`
+- `sudo docker rm -f my-database`
+- `sudo docker volume rm pgdata`
