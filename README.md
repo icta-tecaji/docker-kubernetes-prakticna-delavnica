@@ -47,14 +47,23 @@
 - Example: Run a PostgreSQL database
 
 ## [Del 5: Docker Networking](./05_Docker_Networking/README.md)
+- Docker networking overview
+- Docker network architecture (Advanced)
+- Network drivers
+- Bridge networks
+- Host network
+- Overlay networks
+- Connecting to existing networks (Advanced)
+- Disable networking for a container
+- Service discovery (Advanced)
+- Docker and iptables (Advanced)
 
 ## [Del 6: Building Images](./06_Building_Images/README.md)
 - Best practices for writing Dockerfiles
 - Optimizing your Docker images
-- https://docs.docker.com/develop/develop-images/build_enhancements/
 - pkažemo volume ukaz, da ustvari volumen -> ES 80
 
-## Del 7: Sharing Docker Images
+## [Del 7: Sharing Docker Images](./07_Sharing_Docker_Images/)
 - https://docs.docker.com/get-started/04_sharing_app/
 - Searching Docker Hub from the CLI (NP-59)
 - Pulling images by digest (NP - 65)
@@ -77,6 +86,7 @@
 ## Del 13: Docker Security
 - Container security
 - Container scanning
+- https://docs.docker.com/network/iptables/#restrict-connections-to-the-docker-host
 
 ## Del 14: Advanced Docker
 - Controlling HTTP traffic to containers with a reverse proxy
