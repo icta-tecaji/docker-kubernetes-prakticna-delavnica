@@ -115,6 +115,21 @@ Drugo:
 ## [Del 15: Docker Exercises](./15_Docker_Exercises/README.md)
 - praktični primeri realnih aplikaciji
 
+## Del 16: Container orchestration and microservices
+- Kubernetes vs Docker Swarm
+
+
+## Del 17: Introduction to Kubernetes
+- Kubernetes history
+- Kubernetes principles of operation
+- Kubernetes architecture
+
+## Del 18: Kubernetes Pods
+
+## Del 19: Replication controllers
+
+## Del 20: Kubernetes Deployments
+
 
 
 ## Gradiva
