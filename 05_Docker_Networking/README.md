@@ -174,13 +174,39 @@ Stop and remove all containers and networks.
 - Each user-defined network creates a configurable bridge.
 
 ## Host network
-- https://docs.docker.com/network/host/
-- https://docs.docker.com/network/network-tutorial-host/
+If you use the host network mode for a container, that **container’s network stack is not isolated from the Docker host** (the container shares the host’s networking namespace), and the container **does not get its own IP-address allocated**.
+
+> Given that the container does not have its own IP-address when using host mode networking, port-mapping does not take effect.
+
+Host mode networking can be useful to **optimize performance**, and in situations where a **container needs to handle a large range of ports**, as it does not require network address translation (NAT), and no “userland-proxy” is created for each port.
+
+> The host networking driver only works on Linux hosts.
+
+The goal is to **start a nginx container which binds directly to port 80 on the Docker host**. From a networking point of view, this is the same level of isolation as if the nginx process were running directly on the Docker host and not in a container. However, in all other ways, such as storage, process namespace, and user namespace, the nginx process is isolated from the host.
+- `sudo docker run --rm -d --network host --name my_nginx nginx`
+- Access Nginx by browsing to `http://<IP>:80/`.
+- Examine all network interfaces and verify that a new one was not created: `ip addr show`
+
+Verify which process is bound to port 80, using the netstat command. You need to use sudo because the process is owned by the Docker daemon user and you otherwise won’t be able to see its name or PID.
+- `sudo netstat -tulpn | grep :80`
+- `sudo docker exec -it my_nginx /bin/bash`
+- `apt update`
+- `apt install -y iproute2`
+- `ip addr show`
+- `exit`
+- `sudo docker container stop my_nginx`
 
 ## Overlay networks
-- Na hitro povemo, se ne spuščamo globoko
-- https://docs.docker.com/network/overlay/
-- https://docs.docker.com/network/network-tutorial-overlay/
+Overlay networks are **multi-host**. 
+
+They allow a single network to span multiple hosts so that containers on different hosts can communicate directly. They’re ideal for container-to-container communication, including container-only applications, and they scale well.
+
+Docker provides a native driver for overlay networks. This makes creating them as simple as adding the `--d
+overlay` flag to the docker network create command.
+
+More info:
+- [Use overlay networks](https://docs.docker.com/network/overlay/)
+- [Networking with overlay networks](https://docs.docker.com/network/network-tutorial-overlay/)
 
 ## Connecting to existing networks (Advanced)
 
