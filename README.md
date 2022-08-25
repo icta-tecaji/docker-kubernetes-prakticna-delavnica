@@ -55,6 +55,7 @@
 - Overlay networks
 - Connecting to existing networks (Advanced)
 - Disable networking for a container
+- Port Mapping
 - Service discovery (Advanced)
 - Docker and iptables (Advanced)
 
