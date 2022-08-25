@@ -69,6 +69,8 @@ Start two alpine containers running `ash`, which is Alpine’s default shell rat
 - `sudo docker run -dit --name alpine2 alpine ash`
 - `sudo docker container ls`
 - `sudo docker network inspect bridge` (Inspect the bridge network to see what containers are connected to it.)
+- `ip addr show` (see new veth interface in the host)
+- `bridge link`
 - `sudo docker attach alpine1`
 - `ip addr show` (show the network interfaces for alpine1 as they look from within the container)
 - `ping -c 2 google.com` (make sure you can connect to the internet)

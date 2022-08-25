@@ -60,9 +60,18 @@
 - Docker and iptables (Advanced)
 
 ## [Del 6: Building Images](./06_Building_Images/README.md)
+- Containerizing an app - overview
+
+Drugo:
 - Best practices for writing Dockerfiles
+- https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
+- Build images with BuildKit
+- https://docs.docker.com/develop/develop-images/build_enhancements/
+- Use multi-stage builds
+- https://docs.docker.com/develop/develop-images/multistage-build/
 - Optimizing your Docker images
 - pkažemo volume ukaz, da ustvari volumen -> ES 80
+- https://docs.docker.com/develop/dev-best-practices/
 
 ## [Del 7: Sharing Docker Images](./07_Sharing_Docker_Images/)
 - https://docs.docker.com/get-started/04_sharing_app/
