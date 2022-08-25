@@ -73,90 +73,16 @@ Drugo:
 - pkažemo volume ukaz, da ustvari volumen -> ES 80
 - https://docs.docker.com/develop/dev-best-practices/
 
-## [Del 7: Sharing Docker Images](./07_Sharing_Docker_Images/)
+## [Del 7: Sharing Docker Images](./07_Sharing_Docker_Images/README.md)
 - https://docs.docker.com/get-started/04_sharing_app/
 - Searching Docker Hub from the CLI (NP-59)
 - Pulling images by digest (NP - 65)
 
-## Del 8: Running Multi-container Apps With Docker Compose
+## [Del 8: Running Multi-container Apps With Docker Compose](./08_Running_Multi_container_Apps_With_Docker_Compose/README.md)
 - razlika med verzijami composa in kako se inštwlira
 
-## Del 9: Docker Reliability And Health Checks
+## [Del 9: Docker Reliability And Health Checks](./09_Docker_Reliability_And_Health_Checks/README.md)
 - Resource control
-- NP DDD - 84: Self-healing containers with restart policies
-
-## Del 10: Managing Application Logs
-- https://sematext.com/guides/docker-logs/
-
-## Del 11: Monitoring
-- Portainer
-
-## Del 12: Docker Configuration Management
-
-## Del 13: Docker Security
-- Container security
-- Container scanning
-- https://docs.docker.com/network/iptables/#restrict-connections-to-the-docker-host
-
-## Del 14: Advanced Docker
-- Controlling HTTP traffic to containers with a reverse proxy
-- Multi-architecture images (NP - 67)
-- Asynchronous communication with a message queue
-- https://medium.com/@saschagrunert/demystifying-containers-part-i-kernel-space-2c53d6979504
-
-
-## Del 15: Docker Exercises 
-
-
-## Gradiva
-- [Docker Official Samples](https://docs.docker.com/samples/#tutorial-labs)
-- [Github: Microservices Demo](https://github.com/microservices-demo)
-
-- https://nickjanetakis.com/blog/tag/docker-tips-tricks-and-tutorials
-- https://collabnix.com/
-
-- https://github.com/sixeyed/diamol
-
-
-# Docker
-- zakaj docker (lažja inštalacija) - se pokaže primer
-
-- kaj je container
-	- namespacing
-	- control group
-- kako je image povezan z kontejnerjem
-- docker run command, overrinding defoult commands
-- docker ps, busybox, docker ps --all
-- docker run = docker create + docker start
-- lifecycle of a docker conatiner
-- docker system prune -> zbrišemo vse neuborabljene zdeve u dockerju
-- docker container prune
-- docker rm 
-- docker getting logs
-- docker stop, kill
-- docker exec -it
-- container isolation
-
-## Storage and volumes
-- File trees and mount points
-- Bind mounts
-- In-memory storage
-- Docker volumes
-    - Volumes provide container-independent data management
-    - 
-
-## Single host networking
-- Docker container networking
-    - Network drivers
-- Bridge networks
-    - Differences between user-defined bridges and the default bridge
-    - Manage a user-defined bridge
-    - Exploring a bridge network
-- Host and none network
-
-
-
-## Resource controls
 - Setting resource allowances
     - Memory limits
     - CPU
@@ -164,6 +90,48 @@ Drugo:
 - Sharing memory
 - Understanding users
     - Working with the run-as user
+- NP DDD - 84: Self-healing containers with restart policies
+
+## [Del 10: Managing Application Logs](./10_Managing_Application_Logs/README.md)
+- https://sematext.com/guides/docker-logs/
+
+## [Del 11: Monitoring](./11_Monitoring/README.md)
+- Portainer
+
+## [Del 12: Docker Configuration Management](./12_Docker_Configuration_Management/README.md)
+- env variables
+
+## [Del 13: Docker Security](./13_Docker_Security/README.md)
+- Container security
+- Container scanning
+- https://docs.docker.com/network/iptables/#restrict-connections-to-the-docker-host
+
+## [Del 14: Advanced Docker](./14_Advanced_Docker/README.md)
+- Controlling HTTP traffic to containers with a reverse proxy
+- Multi-architecture images (NP - 67)
+- Asynchronous communication with a message queue
+- https://medium.com/@saschagrunert/demystifying-containers-part-i-kernel-space-2c53d6979504
+
+## [Del 15: Docker Exercises](./15_Docker_Exercises/README.md)
+- praktični primeri realnih aplikaciji
+
+
+
+## Gradiva
+- [Docker Official Samples](https://docs.docker.com/samples/#tutorial-labs)
+- [Github: Microservices Demo](https://github.com/microservices-demo)
+- [Docker Tips, Tricks and Tutorials](https://nickjanetakis.com/blog/tag/docker-tips-tricks-and-tutorials)
+- [Collabnix](https://collabnix.com/)
+
+
+
+
+
+
+
+
+
+
 
 ## Kubernetes
 - https://kubernetes.io/docs/tasks/administer-cluster/migrating-from-dockershim/check-if-dockershim-removal-affects-you/
