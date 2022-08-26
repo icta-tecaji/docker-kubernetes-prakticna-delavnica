@@ -61,27 +61,31 @@
 
 ## [Del 6: Building Images](./06_Building_Images/README.md)
 - Containerizing an app - overview
-
-Drugo:
+- Building your first container image
+- Understanding Docker images and image layers
+- Understanding the image layer cache
+- Understand how CMD and ENTRYPOINT interact
+- Difference between the COPY and ADD commands
+- Using the VOLUME command inside Dockerfiles
 - Best practices for writing Dockerfiles
-- https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
-- Build images with BuildKit
-- https://docs.docker.com/develop/develop-images/build_enhancements/
+- Example: Build a Python application
 - Use multi-stage builds
-- https://docs.docker.com/develop/develop-images/multistage-build/
-- Optimizing your Docker images
-- pkažemo volume ukaz, da ustvari volumen -> ES 80
-- https://docs.docker.com/develop/dev-best-practices/
+- More best practices for writing Dockerfiles (Advanced) 
+- Building Docker images from a container (Advanced)
+- Build images with BuildKit (Advanced)
 
 ## [Del 7: Sharing Docker Images](./07_Sharing_Docker_Images/README.md)
 - https://docs.docker.com/get-started/04_sharing_app/
 - Searching Docker Hub from the CLI (NP-59)
 - Pulling images by digest (NP - 65)
+- reteg a image
+- NP 96
 
 ## [Del 8: Running Multi-container Apps With Docker Compose](./08_Running_Multi_container_Apps_With_Docker_Compose/README.md)
 - razlika med verzijami composa in kako se inštwlira
 
 ## [Del 9: Docker Reliability And Health Checks](./09_Docker_Reliability_And_Health_Checks/README.md)
+- running processes as pid 1
 - Resource control
 - Setting resource allowances
     - Memory limits
@@ -99,7 +103,7 @@ Drugo:
 - Portainer
 
 ## [Del 12: Docker Configuration Management](./12_Docker_Configuration_Management/README.md)
-- env variables
+- env variables ES-34
 
 ## [Del 13: Docker Security](./13_Docker_Security/README.md)
 - Container security
