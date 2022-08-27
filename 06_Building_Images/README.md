@@ -170,6 +170,7 @@ When you mount a volume, it may be named or anonymous. Anonymous volumes are not
 ## Best practices for writing Dockerfiles
 - https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#dockerfile-instructions
 - https://docs.docker.com/develop/dev-best-practices/
+- https://docs.docker.com/get-started/09_image_best/
 - stara gradiva
 - NP 104
 

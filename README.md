@@ -75,11 +75,14 @@
 - Build images with BuildKit (Advanced)
 
 ## [Del 7: Sharing Docker Images](./07_Sharing_Docker_Images/README.md)
-- https://docs.docker.com/get-started/04_sharing_app/
-- Searching Docker Hub from the CLI (NP-59)
-- Pulling images by digest (NP - 65)
-- reteg a image
-- NP 96
+- Working with registries, repositories, and image tags
+- Create a repo on Docker Hub
+- Pushing your own images to Docker Hub
+- Run the image on a new instance
+- Introducing self-hosted registries
+- Running and using your own Docker registry
+- Using image tags effectively
+- Configure the credentials store (Advanced)
 
 ## [Del 8: Running Multi-container Apps With Docker Compose](./08_Running_Multi_container_Apps_With_Docker_Compose/README.md)
 - razlika med verzijami composa in kako se inštwlira
