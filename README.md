@@ -136,12 +136,41 @@
 - Kubernetes architecture
 
 ## Del 18: Kubernetes Pods
+- multicontainer Pods
+- self-healing apps
 
 ## Del 19: Replication controllers
 
 ## Del 20: Kubernetes Deployments
+- Performing a rolling update
+- Managing app releases with rollouts and rollbacks
 
+## Del 21: Services, Load Balancing, and Networking
 
+## Del 22: Storing data in Kubernetes
+- Volumes
+- Storage Providers
+
+## Del 23: Configuring applications with ConfigMaps and Secrets
+- Configuring containerized applications
+- Using environment variables in Kubernetes
+- Creating configmaps using the kubectl
+- Storing and using configuration files in ConfigMaps
+
+## Del 24: Scaling applications
+
+## Del 25: StatefulSets and Jobs
+
+## Del 26: Centralized logging and monitoring applications
+
+## Del 27: Packaging and managing apps with Helm
+
+## Del 28: Kubernetes security
+- Securing applications with policies, contexts, and admission control
+
+## Del 29: Advanced Kubernetes
+
+## Del 30: Developer workflows and CI/CD
 
 ## Gradiva
 - [Docker Official Samples](https://docs.docker.com/samples/#tutorial-labs)

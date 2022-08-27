@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sleep
+spec:
+  selector:
+    matchLabels:
+      app: sleep
+  template:
+    metadata:
+      labels:
+        app: sleep
+    spec:
+      containers:
+        - name: sleep
+          image: leon11sj/sleep
+          env:
+          - name: NON_VALID_VARIABLE
+            value: "I'm here"
+          - name: MY_APP_ID
+            valueFrom:
+              configMapKeyRef:    # This value comes from a ConfigMap.
+                name: sleep-config-literal   # Names the ConfigMap
+                key: my-app-id       # # Names the data item to load

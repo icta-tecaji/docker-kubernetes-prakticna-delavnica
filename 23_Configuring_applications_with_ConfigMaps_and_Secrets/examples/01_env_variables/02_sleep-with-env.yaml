@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sleep
+spec:
+  selector:
+    matchLabels:
+      app: sleep
+  template:
+    metadata:
+      labels:
+        app: sleep
+    spec:
+      containers:
+        - name: sleep
+          image: leon11sj/sleep
+          env:                          # Sets environment variables
+          - name: NON_VALID_VARIABLE    # Defines the name of the variable to create
+            value: "I'm here"           # Defines the value to set for the variable
