@@ -85,7 +85,11 @@
 - Configure the credentials store (Advanced)
 
 ## [Del 8: Running Multi-container Apps With Docker Compose](./08_Running_Multi_container_Apps_With_Docker_Compose/README.md)
-- razlika med verzijami composa in kako se inštwlira
+- Overview of Docker Compose and installation
+- Compose background
+- Running a single-container application with Compose
+- Running a multi-container application with Compose
+
 
 ## [Del 9: Docker Reliability And Health Checks](./09_Docker_Reliability_And_Health_Checks/README.md)
 - running processes as pid 1
