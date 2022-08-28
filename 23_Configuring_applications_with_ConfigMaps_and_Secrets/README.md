@@ -72,5 +72,72 @@ Creating ConfigMaps from literal values is fine for individual settings, but it 
 
 ## Storing and using configuration files in ConfigMaps
 
+An **environment file** — a text file with key-value pairs can be
+loaded to create one ConfigMap with multiple data items.
+- `cd 23_Configuring_applications_with_ConfigMaps_and_Secrets/examples/02_config_maps/`
+- `cat data.env`
+
+Environment files are a useful way to group multiple settings, and Kubernetes has explicit support for loading them into ConfigMaps and surfacing all the settings as environment variables in a Pod container.
+
+Create a new ConfigMap populated from the environment file, then deploy an update to the sleep app to use the new settings:
+- Load an environment variable into a new ConfigMap: `sudo kubectl create configmap sleep-config-env-file --from-env-file=data.env`
+- Check the details of the ConfigMap: `sudo kubectl get cm sleep-config-env-file`
+- `sudo kubectl describe cm sleep-config-env-file`
+- `cat 01_sleep-with-configMap-env-file.yaml`
+- Update the Pod to use the new ConfigMap: `sudo kubectl apply -f 01_sleep-with-configMap-env-file.yaml`
+- `sudo kubectl exec deploy/sleep -- sh -c 'printenv'`
+- `sudo kubectl delete deployment sleep`
+
+So the **environment variables defined with `env` in the Pod spec override the values defined with `envFrom` if there are duplicate keys**. It’s useful to remember that you can override any environment variables set in the container image or in ConfigMaps by explicitly setting them in the Pod spec — a **quick way to change a configuration setting** when you’re tracking down problems.
+
+Environment variables are well supported, but most application platforms prefer a **more structured approach**.
+
+Run a demo todo app. This run of the app will use all the default settings from the JSON configuration file in the image, except for the default logging level, which is set as an environment variable.
+- `cd 23_Configuring_applications_with_ConfigMaps_and_Secrets/examples/03_config_maps_files`
+- `cat 01_todo-web.yaml`
+- `sudo kubectl apply -f 01_todo-web.yaml`
+- `sudo kubectl wait --for=condition=Ready pod -l app=todo-web`
+- Get the IP address of the app: `sudo kubectl get svc todo-web`
+- Browse to the app and have a play around: `http://<IP>:8080/`
+- Then try browsing to `/config`
+- Check the application logs: `sudo kubectl logs -l app=todo-web`
+
+In its current setup, it lets you add and view items, but there should also be a /config page we can use in nonproduction environments to view all the configuration settings. That page is empty, and the app logs a warning that someone tried to access it.
+
+In Kubernetes, we can use the following configuration approach:
+- **Default app settings are baked into the container image**. This could be just the settings which apply in every environment, or it could be a full set of configuration options, so without any extra setup, the app runs in development mode.
+- The **actual settings for each environment are stored in a ConfigMap and surfaced into the container filesystem**. Kubernetes presents the configuration data as a file in a known location, which the app checks and merges with the content from the default file.
+- Any **settings that need to be tweaked can be applied as environment variables** in the Pod specification for the Deployment.
+
+The YAML specification for the development configuration of the todo app. 
+- `cat todo-web-config-dev.yaml`
+
+> NOTE: The pipeline character after the colon in the first line of both entries signals that a literal multi-line value follows.
+
+It contains the contents of a JSON file, which the app will merge with the
+default JSON configuration file in the container image, with a setting to make the config page visible. 
+
+You **can embed any kind of text configuration file into a YAML spec**, as long as you’re careful with the whitespace. 
+
+The ConfigMap definition contains just a single setting, but it’s stored in the native configuration format for the app. When we deploy an updated Pod spec, the setting will be applied and the config page will be visible.
+- `sudo kubectl apply -f todo-web-config-dev.yaml`
+- `sudo kubectl apply -f 02_todo-web-dev.yaml`
+- Refresh your web browser at the `/config` page for your Service
+- `sudo kubectl get pods`
+- `sudo kubectl exec <POD_NAME> -- cat /app/config/config.json`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

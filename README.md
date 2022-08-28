@@ -151,7 +151,7 @@
 - Volumes
 - Storage Providers
 
-## Del 23: Configuring applications with ConfigMaps and Secrets
+## [Del 23: Configuring applications with ConfigMaps and Secrets](./23_Configuring_applications_with_ConfigMaps_and_Secrets/README.md)
 - Configuring containerized applications
 - Using environment variables in Kubernetes
 - Creating configmaps using the kubectl
