@@ -14,11 +14,11 @@ spec:
       containers:
         - name: web
           image: leon11sj/todo-list
-          volumeMounts:
-            - name: config
-              mountPath: "/app/config"
-              readOnly: true
+          volumeMounts: # Mounts a volume into the container
+            - name: config  # Names the volume
+              mountPath: "/app/config"  # Directory path to mount the volume
+              readOnly: true  # Flags the volume as read-only
       volumes:
-        - name: config
-          configMap:
-            name: todo-web-config-dev
+        - name: config # Volumes are defined at the Pod level. Name matches the volume mount.
+          configMap:  # Volume source is a ConfigMap. 
+            name: todo-web-config-dev  # ConfigMap name

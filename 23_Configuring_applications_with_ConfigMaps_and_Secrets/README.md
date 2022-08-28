@@ -123,17 +123,60 @@ The ConfigMap definition contains just a single setting, but it’s stored in th
 - `sudo kubectl apply -f todo-web-config-dev.yaml`
 - `sudo kubectl apply -f 02_todo-web-dev.yaml`
 - Refresh your web browser at the `/config` page for your Service
-- `sudo kubectl get pods`
-- `sudo kubectl exec <POD_NAME> -- cat /app/config/config.json`
 
+The container filesystem is a virtual construct, built from the container image and other sources. Kubernetes can use ConfigMaps as a filesystem source—they are mounted as a directory, with a file for each data item.
 
+![ConfigMaps](./images/img02.png)
+<!-- Vir: Elton Stoneman - Learn Kubernetes in a Month of Lunches-Manning Publications (2021) -->
 
+Kubernetes manages this strange magic with two features of the Pod spec: 
+1. **volumes**: which make the contents of the ConfigMap available to the Pod 
+2. **volume mounts**: which load the contents of the ConfigMap volume into a specified path in the Pod container.
 
+**The ConfigMap is treated like a directory, with multiple data items, which each become files in the container filesystem**.
 
+The container filesystem appears as a single storage unit to the application, but it has been built from the image and the ConfigMap. Those sources have different behaviors.
+- Show the default config file: `sudo kubectl exec deploy/todo-web -- sh -c 'ls -l /app/app*.json'`
+- Show the config file in the volume mount: `sudo kubectl exec deploy/todo-web -- sh -c 'ls -l /app/config/*.json'` (The file appears to have read-write permissions, but the path is actually a link to a read-only file.)
+- `sudo kubectl exec deploy/todo-web -- sh -c 'cat /app/config/config.json'`
+- Check it really is read-only: `sudo kubectl exec deploy/todo-web -- sh -c 'echo test >> /app/config/config.json'`
 
+If your configuration is split across multiple files, you can store it all in a single ConfigMap and load it all into the container.
+- `cat todo-web-config-dev-with-logging.yaml`
 
+*What happens when you deploy an update to a ConfigMap that a live Pod is using?*
+- Kubernetes delivers the updated files to the container, but what happens next depends on the application. 
+    - Some apps load configuration files into memory when they start and then ignore any changes in the config directory, so **changing the ConfigMap won’t actually change the app** configuration until the Pods are replaced.
+    - This **application watches the config directory and reloads** any file changes, so deploying an update to the ConfigMap will update the application configuration.
 
+Update the app configuration with the ConfigMap:
+- Check the current app logs: `sudo kubectl logs -l app=todo-web`
+- Deploy the updated ConfigMap: `sudo kubectl apply -f todo-web-config-dev-with-logging.yaml`
+- Wait for the config change to make it to the Pod
+- Check the new setting: `sudo kubectl exec deploy/todo-web -- sh -c 'ls -l /app/config/*.json'`
+- `sudo kubectl logs -l app=todo-web`
 
+Volumes are a powerful option for loading config files, especially with apps like this, which react to changes and update settings on the fly.
+
+If the **mount path for a volume already exists in the container image**, then the **ConfigMap directory overwrites it, replacing all the contents**, which can cause your app to fail in exciting ways.
+- `cat 03_todo-web-dev-broken.yaml`
+- Deploy the badly configured Pod: `sudo kubectl apply -f 03_todo-web-dev-broken.yaml`
+- Browse back to the app and see how it looks
+- Check the app logs: `sudo kubectl logs -l app=todo-web`
+- Check the Pod status: `sudo kubectl get pods -l app=todo-web` (Kubernetes will wait before restarting the container again, which is the CrashLoopBackOff status.)
+
+The results here are interesting: the deployment breaks the app, and yet the app carries on working. That’s Kubernetes watching out for you. Applying the change creates a new Pod, and the container in that Pod immediately exits with an error, because the binary it tries to load no longer exists in the app directory. **Kubernetes restarts the container a few times to give it a chance**, but it keeps failing.
+
+You can selectively load data items into the target directory, rather
+than loading every data item as its own file. The mount path has been fixed, but the volume is set to deliver only one item.
+- `cat 04_todo-web-dev-no-logging.yaml`
+- Apply the change: `sudo kubectl apply -f 04_todo-web-dev-no-logging.yaml`
+- List the config folder contents: `sudo kubectl exec deploy/todo-web -- sh -c 'ls /app/config'`
+- Now browse to a few pages on the app
+- `sudo kubectl logs -l app=todo-web`
+- `sudo kubectl get pods -l app=todo-web`
+
+One thing **you shouldn’t use ConfigMaps for, however, is any sensitive data** — they’re effectively wrappers for text files with no additional security semantics.
 
 
 
