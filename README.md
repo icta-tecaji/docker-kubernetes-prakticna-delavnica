@@ -93,6 +93,7 @@
 
 ## [Del 9: Docker Reliability And Health Checks](./09_Docker_Reliability_And_Health_Checks/README.md)
 - running processes as pid 1
+- https://docs.docker.com/engine/reference/builder/#exec-form-entrypoint-example
 - Resource control
 - Setting resource allowances
     - Memory limits

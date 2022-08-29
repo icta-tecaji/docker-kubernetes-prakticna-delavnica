@@ -148,12 +148,77 @@ Example simpleweb (build the example step by step):
     - Try with port mapping: `sudo docker run --rm -p 80:8080 simpleweb`
 
 ## Understand how CMD and ENTRYPOINT interact
-- https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact
-- stara gradiva
+
+Both `CMD` and `ENTRYPOINT` instructions define what command gets executed when running a container. There are few rules that describe their co-operation.
+1. Dockerfile should specify at least one of `CMD` or `ENTRYPOINT` commands.
+2. `ENTRYPOINT` should be defined when using the container as an executable.
+3. `CMD` should be used as a way of defining default arguments for an `ENTRYPOINT` command or for executing an ad-hoc command in a container.
+4. `CMD` will be overridden when running the container with alternative arguments.
+5. Only the last `ENTRYPOINT` instruction in the Dockerfile will have an effect.
+6. If Dockerfile has more than one `CMD` instruction, all but last `CMD` instructions are ignored.
+
+> If CMD is defined from the base image, setting ENTRYPOINT will reset CMD to an empty value. In this scenario, CMD must be defined in the current image to have a value.
+
+Command line arguments to `docker run <image>` will be appended after all elements in an exec form ENTRYPOINT, and will override all elements specified using CMD. This allows arguments to be passed to the entry point, i.e., `docker run <image> -d` will pass the `-d` argument to the entry point. You can override the ENTRYPOINT instruction using the `docker run --entrypoint` flag.
+- `cd 06_Building_Images/examples/03_entrypoint_vs_cmd/`
+- `sudo docker image build -t entrypointcmd:v1 -f Dockerfile_01 .`
+> We can use `--file` , `-f` in docker build command: Name of the Dockerfile (Default is 'PATH/Dockerfile') 
+- `sudo docker run --rm entrypointcmd:v1`
+- `sudo docker run --rm entrypointcmd:v1 -la`
+- `sudo docker run --rm --entrypoint ps entrypointcmd:v1 aux`
+- `sudo docker image build -t entrypointcmd:v2 -f Dockerfile_02 .`
+- `sudo docker run --rm entrypointcmd:v2`
+- `sudo docker run --rm entrypointcmd:v2 ls -la`
+- `sudo docker image build -t entrypointcmd:v3 -f Dockerfile_03 .`
+- `sudo docker run --rm entrypointcmd:v3`
+- `sudo docker run --rm entrypointcmd:v3 -l`
+
+- The **exec form**, which is the preferred form: `ENTRYPOINT ["executable", "param1", "param2"]`
+- The **shell form**: `ENTRYPOINT command param1 param2`
+
+> TIP:  **Using the exec (or string array) form wherever possible is the best practice.** At a minimum, a Dockerfile should be consistent and avoid mixing styles. This will make your Dockerfiles more readable and ensure that instructions behave as you’d expect without detailed understanding of their nuances.
+
+The shell form has the disadvantage that your ENTRYPOINT will be started as a subcommand of `/bin/sh -c`, which **does not pass signals**. This means that the executable **will not be the container’s PID 1** - and will not receive Unix signals - so your executable will not receive a `SIGTERM` from `docker stop <container>`.
+
+- `sudo docker image build -t run_exec -f Dockerfile_04 .`
+- `sudo docker image build -t run_shell -f Dockerfile_05 .`
+- Exec form: 
+    - `sudo docker run -d --rm --name exec run_exec`
+    - `sudo docker exec -it exec ps x`
+    - `time sudo docker stop exec`
+- Shell form:
+    - `sudo docker run -d --rm --name shell run_shell`
+    - `sudo docker exec -it shell ps x`
+    - `time sudo docker stop shell`
+
+> The [table shows](https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact) what command is executed for different ENTRYPOINT / CMD combinations.
+
+- **Prefer ENTRYPOINT** to CMD **when building executable Docker image** and you need a command always to be executed. Additionally use CMD if you need to provide extra default arguments that could be overwritten from command line when docker container runs.
+- **Choose CMD** if you need to **provide a default command** and/or arguments that can be overwritten from command line when docker container runs.
 
 ## Difference between the COPY and ADD commands
-- https://www.geeksforgeeks.org/difference-between-the-copy-and-add-commands-in-a-dockerfile/
-- https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#add-or-copy
+
+When creating Dockerfiles, it’s often necessary to transfer files from the host system into the Docker image. These could be property files, native libraries, or other static content that our applications will require at runtime.
+
+The Dockerfile specification **provides two ways to copy files from the source system into an image**: the `COPY` and `ADD` directives.
+
+Generally speaking, **`COPY` is preferred**. That’s because it’s more transparent than ADD. COPY only supports the basic copying of local files into the container, while ADD has some features (like local-only tar extraction and remote URL support) that are not immediately obvious.
+
+Because image size matters, **using ADD to fetch packages from remote URLs is strongly discouraged**; you should use curl or wget instead. That way you can delete the files you no longer need after they’ve been extracted and you don’t have to add another layer in your image. For example, you should avoid doing things like:
+```Dockerfile
+ADD https://example.com/big.tar.xz /usr/src/things/
+RUN tar -xJf /usr/src/things/big.tar.xz -C /usr/src/things
+RUN make -C /usr/src/things all
+```
+And instead, do something like:
+```Dockerfile
+RUN mkdir -p /usr/src/things \
+    && curl -SL https://example.com/big.tar.xz \
+    | tar -xJC /usr/src/things \
+    && make -C /usr/src/things all
+```
+
+A valid use case for ADD is when you want to extract a local tar file into a specific directory in your Docker image. If you are copying local files to your Docker image, always use COPY because it’s more explicit.
 
 ## Using the VOLUME command inside Dockerfiles
 -> ES 80
