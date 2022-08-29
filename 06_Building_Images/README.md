@@ -290,6 +290,11 @@ Small images are faster to pull over the network and faster to load into memory 
 - Try to reduce the number of layers in your image by minimizing the number of separate commands in your Dockerfile.
 - If you have multiple images with a lot in common, consider creating your own base image with the shared components, and basing your unique images on that. 
 
+For example, if your build contains several layers, you can order them from the less frequently changed (to ensure the build cache is reusable) to the more frequently changed:
+- Install tools you need to build your application
+- Install or update library dependencies
+- Generate your application
+
 ### Start your Dockerfile with the steps that are least likely to change
 This is easier said than done. Anyway, your image will stabilize after a while and changes will be less likely. The best practice is to structure your Dockerfile according to the following:
 1. Install tools that are needed to build your application.
@@ -340,18 +345,23 @@ Put it all together by running the docker image build command from the directory
 - `sudo docker stop smart-api`
 
 ## Use multi-stage builds
-- ES 45
-- NP 101
-- https://docs.docker.com/develop/develop-images/multistage-build/
 
-Multi-stage builds allow you to drastically reduce the size of your final image, without struggling to reduce the number of intermediate layers and files.
+The aim of the game is to only ship production images with the stuff needed to run your app in production.
 
-Because an image is built during the final stage of the build process, you can minimize image layers by leveraging build cache.
+One of the **most challenging things about building images is keeping the image size down**. Each instruction in the Dockerfile adds a layer to the image, and you need to remember to clean up any artifacts you don’t need before moving on to the next layer. To write a really efficient Dockerfile, you have traditionally needed to employ **shell tricks and other logic to keep the layers as small as possible** and to ensure that each layer has the artifacts it needs from the previous layer and nothing else.
 
-For example, if your build contains several layers, you can order them from the less frequently changed (to ensure the build cache is reusable) to the more frequently changed:
-- Install tools you need to build your application
-- Install or update library dependencies
-- Generate your application
+Multi-stage builds have a **single Dockerfile containing multiple FROM instructions**. Each FROM instruction is a new build stage that can easily **COPY artefacts from previous stages**. You can selectively copy artifacts from one stage to another, leaving behind everything you don’t want in the final image.
+
+> Check for language specific tutorials. [Python](https://pythonspeed.com/articles/smaller-python-docker-images/) / [Java](https://dzone.com/articles/multi-stage-docker-image-build-for-java-apps) / [Go](https://docs.docker.com/develop/develop-images/multistage-build/#use-multi-stage-builds) / [NodeJS](https://cloudnweb.dev/2019/10/crafting-multi-stage-builds-with-docker-in-node-js/)
+
+To show how this works, let’s adapt the Dockerfile from the previous section to use multi-stage builds.
+- `cd 06_Building_Images/examples/08_python_app_multi_stage/`
+- `docker image ls smart-api` (size of the image)
+- `cat Dockerfile.prod`
+- `sudo docker image build -t smart-api-prod -f Dockerfile.prod .`
+- `sudo docker run --rm -d --name smart-api -p 80:5000 smart-api-prod`
+- `docker image ls smart-api-prod` (size of the image)
+- `sudo docker stop smart-api`
 
 ## More best practices for writing Dockerfiles (Advanced) 
 
@@ -362,4 +372,5 @@ For example, if your build contains several layers, you can order them from the 
 [More here](./Building_Docker_images_from_a_container_Advanced.md).
 
 ## Build images with BuildKit (Advanced)
-- https://docs.docker.com/develop/develop-images/build_enhancements/
+
+[More here](./Build_images_with_BuildKit_Advanced.md).
