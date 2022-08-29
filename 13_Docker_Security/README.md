@@ -34,3 +34,6 @@ Most container scanning solutions leverage a public source for vulnerability inf
 Each new layer has the risk of introducing new vulnerabilities into the container, so it’s crucial that the container scanner you use can detect issues layer by layer.
 
 > **How does Container scanning work?** Scanning containers for vulnerabilities usually involves a security tool that analyzes a container image layer by layer to detect potential security issues. Most scanning solutions leverage a database of known vulnerabilities so that organizations can stay up-to-date as the security threat landscape evolves. Containerized applications also consist of multiple components, including custom code, open source dependencies, images, Dockerfiles, and more. Scanning for vulnerabilities across all of these components is critical for comprehensive container security.
+
+
+- https://docs.docker.com/get-started/09_image_best/#security-scanning

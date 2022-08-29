@@ -67,6 +67,7 @@
 - Understand how CMD and ENTRYPOINT interact
 - Difference between the COPY and ADD commands
 - Using the VOLUME command inside Dockerfiles
+- Run containers as non-root user
 - Best practices for writing Dockerfiles
 - Example: Build a Python application
 - Use multi-stage builds
@@ -94,6 +95,7 @@
 ## [Del 9: Docker Reliability And Health Checks](./09_Docker_Reliability_And_Health_Checks/README.md)
 - running processes as pid 1
 - https://docs.docker.com/engine/reference/builder/#exec-form-entrypoint-example
+- https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#entrypoint
 - Resource control
 - Setting resource allowances
     - Memory limits
@@ -112,11 +114,13 @@
 
 ## [Del 12: Docker Configuration Management](./12_Docker_Configuration_Management/README.md)
 - env variables ES-34
+- use secret config 
 
 ## [Del 13: Docker Security](./13_Docker_Security/README.md)
 - Container security
 - Container scanning
 - https://docs.docker.com/network/iptables/#restrict-connections-to-the-docker-host
+- https://docs.docker.com/security/
 
 ## [Del 14: Advanced Docker](./14_Advanced_Docker/README.md)
 - Controlling HTTP traffic to containers with a reverse proxy
@@ -170,6 +174,7 @@
 - Securing applications with policies, contexts, and admission control
 
 ## Del 29: Advanced Kubernetes
+- running private images
 
 ## Del 30: Developer workflows and CI/CD
 
@@ -178,7 +183,7 @@
 - [Github: Microservices Demo](https://github.com/microservices-demo)
 - [Docker Tips, Tricks and Tutorials](https://nickjanetakis.com/blog/tag/docker-tips-tricks-and-tutorials)
 - [Collabnix](https://collabnix.com/)
-
+- [Articles: Production-ready Docker packaging for Python developers](https://pythonspeed.com/docker/)
 
 
 

@@ -173,6 +173,7 @@ Command line arguments to `docker run <image>` will be appended after all elemen
 - `sudo docker run --rm entrypointcmd:v3`
 - `sudo docker run --rm entrypointcmd:v3 -l`
 
+ENTRYPOINT and CMD have two forms:
 - The **exec form**, which is the preferred form: `ENTRYPOINT ["executable", "param1", "param2"]`
 - The **shell form**: `ENTRYPOINT command param1 param2`
 
@@ -221,36 +222,140 @@ RUN mkdir -p /usr/src/things \
 A valid use case for ADD is when you want to extract a local tar file into a specific directory in your Docker image. If you are copying local files to your Docker image, always use COPY because it’s more explicit.
 
 ## Using the VOLUME command inside Dockerfiles
--> ES 80
 
-However, it’s also possible to deploy volumes via Dockerfiles using the VOLUME instruction. The format is VOLUME `<container-mount-point>`. Interestingly, you cannot specify a directory on the host when defining a volume in a Dockerfile. is is because host directories are different depending on what OS your Doer host is running
-– it could break your builds if you specified a directory on a Doer host that doesn’t exist. As a result, defining
-a volume in a Doerfile requires you to specify host directories at deploy-time.
+There are two ways to use volumes with containers: you can manually create volumes and attach them to a container, or **you can use a VOLUME instruction in the Dockerfile.**
 
-Anonymous volumes have no specific source so when the container is deleted, instruct the Docker Engine daemon to remove them.
-- https://docs.docker.com/storage/volumes/#remove-anonymous-volumes
+That builds an **image that will create a volume when you start a container**.
 
-When you mount a volume, it may be named or anonymous. Anonymous volumes are not given an explicit name when they are first mounted into a container, so Docker gives them a random name that is guaranteed to be unique within a given Docker host. Besides the name, named and anonymous volumes behave in the same ways.
+The syntax is simply `VOLUME <target-directory>`.
+```Dockerfile
+FROM ubuntu:20.04
+
+WORKDIR /data
+RUN echo "Hello from Volume" > test
+
+RUN mkdir /uploads
+
+VOLUME /data
+VOLUME /uploads
+
+CMD ["sleep", "10000"]
+```
+
+> You **cannot specify a directory on the host when defining a volume in a Dockerfile**. This is because host directories are different depending on what OS your Docker host is running – it could break your builds if you specified a directory on a Doer host that doesn’t exist. As a result, defining a volume in a Dockerfile requires you to specify host directories at deploy-time.
+
+When you run a container from this image, Docker will automatically create a volume and attach it to the container. You can see that if you run a container from the image and then check the volumes.
+- `cd 06_Building_Images/examples/04_volumes/`
+- `sudo docker image build -t test_volume .`
+- `sudo docker run -d -v uploads_data:/uploads --name test test_volume`
+- `sudo docker container inspect test | grep -A 20 Mounts`
+- `sudo docker volume ls`
+
+Volumes declared in Docker images are created as a separate volume for each container. Images built with a VOLUME instruction will always create a volume for a container if there is no volume specified in the run command. **The volume will have a random ID**, so you can use it after the container is gone, but only if you can work out which volume has your data.
+
+**Anonymous volumes** are not given an explicit name when they are first mounted into a container, so Docker gives them a random name that is guaranteed to be unique within a given Docker host. Besides the name, named and anonymous volumes behave in the same ways.
+
+If the image does have a volume, the volume flag can override it for the container by using an existing volume for the same target path — so a new volume won’t be created.
+
+**As an image author, you should use the `VOLUME` instruction as a fail-safe option for stateful applications**. That way containers will always write data to a persistent volume even if the user doesn’t specify the volume flag. But **as an image user, it’s better not to rely on the defaults** and to work with named volumes.
+- `sudo docker stop test`
+- `sudo docker volume ls`
+- `sudo docker rm test`
+- `sudo docker volume ls`
+- `sudo docker run -d -v uploads_data:/uploads --name test test_volume`
+- `sudo docker volume ls`
+- `sudo docker stop test`
+- `sudo docker rm -v test` (Remove anonymous volumes associated with the container)
+- `docker volume prune`
+
+## Run containers as non-root user
+There are two reasons to avoid running as root, both security related.
+1. First, it means your running process will have less privileges, which means if your process is somehow remotely compromised, the attacker will have a harder time escaping the container.
+2. Second, and this is a more subtle point, running as a non-root user means you won’t try to take actions that require extra permissions. And that means you can run your container with less “capabilities”, making it even more secure.
+
+What you want is your container running as a non-root user from the start. You can do that in your runtime configuration, but then you have to remember to do that.
+
+So an even **better solution is adding a new user when building the image, and using the Dockerfile `USER` command to change the user you run as**. You won’t be able to bind to ports <1024, but that’s a good thing—that’s another capability (`CAP_NET_BIND_SERVICE`) you don’t need. And since your container is pretty much always behind a proxy of some sort, that's fine.
+- `cd 06_Building_Images/examples/06_user/`
+- `sudo docker run --rm ubuntu:20.04 id`
+- `cat Dockerfile`
+- `sudo docker image build -t ubutnu-no-root .`
+- `sudo docker run --rm ubutnu-no-root id`
 
 ## Best practices for writing Dockerfiles
-- https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#dockerfile-instructions
-- https://docs.docker.com/develop/dev-best-practices/
-- https://docs.docker.com/get-started/09_image_best/
-- stara gradiva
-- NP 104
+
+### Keep your images small
+Small images are faster to pull over the network and faster to load into memory when starting containers or services. There are a few rules of thumb to keep image size small:
+- Start with an appropriate base image. 
+- Try to reduce the number of layers in your image by minimizing the number of separate commands in your Dockerfile.
+- If you have multiple images with a lot in common, consider creating your own base image with the shared components, and basing your unique images on that. 
+
+### Start your Dockerfile with the steps that are least likely to change
+This is easier said than done. Anyway, your image will stabilize after a while and changes will be less likely. The best practice is to structure your Dockerfile according to the following:
+1. Install tools that are needed to build your application.
+2. Install dependencies, libraries and packages.
+3. Build your application.
+
+### Clean up your Dockerfile
+Always review your steps in the Dockerfile and only keep the minimum set of steps that are needed by your application. Always remove unnecessary components.
+
+### Containers should be ephemeral (short-lived)
+This would belong to generic Docker guidelines, but it’s never enough to stress this point. It is your best interest to design and **build Docker images that can be destroyed and recreated/replaced automatically or with minimal configuration**. Which means that you should create Dockerfiles that define **stateless images**. Any state, should be kept outside of your containers.
+
+### Don’t install unnecessary packages
+To reduce complexity, dependencies, file sizes, and build times, avoid installing extra or unnecessary packages just because they might be “nice to have.” For example, you don’t need to include a text editor in a database image.
+
+### One container should have one concern - decouple applications
+Each container should have only one concern. Decoupling applications into multiple containers makes it easier to scale horizontally and reuse containers. For instance, a web application stack might consist of three separate containers, each with its own unique image, to manage the web application, database, and an in-memory cache in a decoupled manner.
+
+Limiting each container to one process is a good rule of thumb, but it is not a hard and fast rule. For example, not only can containers be spawned with an init process, some programs might spawn additional processes of their own accord. For instance, Celery can spawn multiple worker processes, and Apache can create one process per request.
+
+Use your best judgment to keep containers as clean and modular as possible. If containers depend on each other, you can use Docker container networks to ensure that these containers can communicate.
+
+### Exclude with .dockerignore
+The directory where you issue the docker build command is called the build context. Docker will send all of the files and directories in your build directory to the Docker daemon as part of the build context. If you have stuff in your directory that is not needed by your build, you’ll have an unnecessarily larger build context that results in a larger image size.
+
+To exclude files not relevant to the build (without restructuring your source repository) use a `.dockerignore` file. This file supports exclusion patterns similar to `.gitignore` files. 
+
+> More about [.dockerignore file](https://docs.docker.com/engine/reference/builder/#dockerignore-file)
+
+### Security scanning
+When you have built an image, it is a good practice to scan it for security vulnerabilities using the docker scan command. Docker has partnered with Snyk to provide the vulnerability scanning service.
 
 ## Example: Build a Python application
-- stara gradiva
-- https://docs.docker.com/language/python/build-images/
+Let’s create a simple Python application using the Flask framework that we’ll use as our example. Let's check the files:
+- `cd 06_Building_Images/examples/07_python_app/`
+- `ls -la`
+- `cat .dockerignore`
+> You can even use the `.dockerignore` file to exclude the `Dockerfile` and `.dockerignore` files. These files are still sent to the daemon because it needs them to do its job. But the ADD and COPY instructions do not copy them to the image.
+- `cat Dockerfile.prod`
+    - The LABEL instruction is used to define key/value pairs that are recorded as additional metadata for an image or container.
+    - **Naming Dockerfiles**: The default and most common name for a Dockerfile is Dockerfile. However, Dockerfiles can be named anything because they are simple text files and the build command accepts any filename you tell it.
+
+Put it all together by running the docker image build command from the directory where the mailer-base file is located. The -f flag tells the builder which filename to use as input:
+- `sudo docker image build -t smart-api -f Dockerfile.prod .`
+- `sudo docker run --rm -d --name smart-api -p 80:5000 smart-api`
+- `sudo docker exec smart-api id`
+- `sudo docker exec smart-api ps aux`
+- `sudo docker stop smart-api`
 
 ## Use multi-stage builds
 - ES 45
 - NP 101
 - https://docs.docker.com/develop/develop-images/multistage-build/
 
+Multi-stage builds allow you to drastically reduce the size of your final image, without struggling to reduce the number of intermediate layers and files.
+
+Because an image is built during the final stage of the build process, you can minimize image layers by leveraging build cache.
+
+For example, if your build contains several layers, you can order them from the less frequently changed (to ensure the build cache is reusable) to the more frequently changed:
+- Install tools you need to build your application
+- Install or update library dependencies
+- Generate your application
+
 ## More best practices for writing Dockerfiles (Advanced) 
 
-[More here](./Best_practices_for_writing_Dockerfiles/Best_practices_for_writing_Dockerfiles.md).
+[More here](./More_best_practices_for_writing_Dockerfiles_Advanced.md).
 
 ## Building Docker images from a container (Advanced)
 

@@ -1,7 +1,9 @@
-# Best practices for writing Dockerfiles
+# More best practices for writing Dockerfiles (Advanced) 
 
 ## Viri
 - [Best practices for writing Dockerfiles](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
+- [Docker development best practices](https://docs.docker.com/develop/dev-best-practices/)
+- [Image-building best practices](https://docs.docker.com/get-started/09_image_best/)
 
 ## General guidelines and recommendations
 
@@ -25,15 +27,13 @@ Each instruction creates one layer:
 
 When you run an image and generate a container, you **add a new writable layer** (the “container layer”) on top of the underlying layers. All changes made to the running container, such as writing new files, modifying existing files, and deleting files, are written to this writable container layer.
 
-### Create ephemeral containers
-The image defined by your Dockerfile should generate containers that are as ephemeral as possible. By “ephemeral”, we mean that the container can be stopped and destroyed, then rebuilt and replaced with an absolute minimum set up and configuration.
-
 ### Understand build context
 When you issue a docker build command, the current working directory is called the **build context**. By default, the Dockerfile is assumed to be located here, but you can specify a different location with the file flag (`-f`). Regardless of where the `Dockerfile` actually lives, all recursive contents of files and directories in the current directory are sent to the Docker daemon as the build context.
 
 Create a directory for the build context and `cd` into it. Write “hello” into a text file named hello and create a `Dockerfile` that runs cat on it. Build the image from within the build context (`.`):
 
 ```bash
+cd 06_Building_Images/examples/05_context/
 mkdir myproject && cd myproject
 echo "hello" > hello
 echo -e "FROM busybox\nCOPY /hello /\nRUN cat /hello" > Dockerfile
@@ -49,31 +49,6 @@ docker build --no-cache -t helloapp:v2 -f dockerfiles/Dockerfile context
 Inadvertently including files that are not necessary for building an image results in a larger build context and larger image size. This can increase the time to build the image, time to pull and push it, and the container runtime size. To see how big your build context is, look for a message like this when building your Dockerfile:
 
     Sending build context to Docker daemon  187.8MB
-
-### Exclude with .dockerignore
-To exclude files not relevant to the build (without restructuring your source repository) use a `.dockerignore` file. This file supports exclusion patterns similar to `.gitignore` files. 
-
-https://docs.docker.com/engine/reference/builder/#dockerignore-file
-
-### Use multi-stage builds
-Multi-stage builds allow you to drastically reduce the size of your final image, without struggling to reduce the number of intermediate layers and files.
-
-Because an image is built during the final stage of the build process, you can minimize image layers by leveraging build cache.
-
-For example, if your build contains several layers, you can order them from the less frequently changed (to ensure the build cache is reusable) to the more frequently changed:
-- Install tools you need to build your application
-- Install or update library dependencies
-- Generate your application
-
-### Don’t install unnecessary packages
-To reduce complexity, dependencies, file sizes, and build times, avoid installing extra or unnecessary packages just because they might be “nice to have.” For example, you don’t need to include a text editor in a database image.
-
-### Decouple applications
-Each container should have only one concern. Decoupling applications into multiple containers makes it easier to scale horizontally and reuse containers. For instance, a web application stack might consist of three separate containers, each with its own unique image, to manage the web application, database, and an in-memory cache in a decoupled manner.
-
-Limiting each container to one process is a good rule of thumb, but it is not a hard and fast rule. For example, not only can containers be spawned with an init process, some programs might spawn additional processes of their own accord. For instance, Celery can spawn multiple worker processes, and Apache can create one process per request.
-
-Use your best judgment to keep containers as clean and modular as possible. If containers depend on each other, you can use Docker container networks to ensure that these containers can communicate.
 
 ### Minimize the number of layers
 In older versions of Docker, it was important that you minimized the number of layers in your images to ensure they were performant. The following features were added to reduce this limitation:
@@ -96,6 +71,8 @@ RUN apt-get update && apt-get install -y \
 ```
 
 ### Leverage build cache
+The build process used by Docker has the concept of a cache that it uses to speed-up the build process. The best way to see the impact of the cache is to build a new image on a clean Docker host, then repeat the same build immediately after. The first build will pull images and take time building layers. The second build will complete almost instantaneously. This is because artefacts from the first build, such as layers, are cached and leveraged by later builds.
+
 When building an image, Docker steps through the instructions in your `Dockerfile`, executing each in the order specified. As each instruction is examined, Docker looks for an existing image in its cache that it can reuse, rather than creating a new (duplicate) image.
 
 If you do not want to use the cache at all, you can use the `--no-cache=true` option on the docker build command. However, if you do let Docker use its cache, it is important to understand when it can, and cannot, find a matching image. The basic rules that Docker follows are outlined below:
@@ -105,3 +82,37 @@ If you do not want to use the cache at all, you can use the `--no-cache=true` op
 - Aside from the `ADD` and `COPY` commands, cache checking does not look at the files in the container to determine a cache match. For example, when processing a `RUN apt-get -y update` command the files updated in the container are not examined to determine if a cache hit exists. In that case just the command string itself is used to find a match.
 
 Once the cache is invalidated, all subsequent Dockerfile commands generate new images and the cache is not used.
+
+### Squash the image
+
+Squashing an image isn’t really a best practice as it has pros and cons. At a high level, Docker follows the normal process to build an image, but then adds an additional step that squashes everything into a single layer.
+
+Squashing can be good in situations where images are starting to have a lot of layers and this isn’t ideal. An example might be when creating a new base image that you want to build other images from in the future — this base is much better as a single-layer image.
+
+On the negative side, squashed images do not share image layers. This can result in storage inefficiencies and larger push and pull operations.
+
+Add the `--squash` flag to the docker image build command if you want to create a squashed image.
+
+![Squashing](./images/img03.png)
+<!-- Vir: Docker Deep Dive, Nigel Poulton -->
+
+Both images are exactly the same except for the fact that one is squashed and the other is not. The non-squashed image shares layers with other images on the host (saving disk space) but the squashed image does not. The squashed image will also need to send every byte to Docker Hub on a docker image push command, whereas the non-squashed image only needs to send unique layers.
+
+### Use no-install-recommends
+
+If you are building Linux images, and using the apt package manager, you should use the `--no-install-recommends` flag with the apt-get install command. This makes sure that apt only installs main dependencies (packages in the Depends field) and not recommended or suggested packages. This can greatly reduce the number of unwanted packages that are downloaded into your images.
+
+> [Example](https://ubuntu.com/blog/we-reduced-our-docker-images-by-60-with-no-install-recommends): We reduced our Docker images by 60% with –no-install-recommends
+
+
+## Dockerfile instructions
+
+### FROM
+Whenever possible, use current official images as the basis for your images. We recommend the Alpine image as it is tightly controlled and small in size (currently under 6 MB), while still being a full Linux distribution.
+
+### LABEL
+You can add labels to your image to help organize images by project, record licensing information, to aid in automation, or for other reasons. For each label, add a line beginning with LABEL and with one or more key-value pairs. The following examples show the different acceptable formats. Explanatory comments are included inline.
+
+### RUN
+Split long or complex RUN statements on multiple lines separated with backslashes to make your Dockerfile more readable, understandable, and maintainable.
+
