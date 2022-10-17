@@ -102,6 +102,7 @@
     - CPU
     - Access to devices
 - Sharing memory
+- Restarting containers
 - Understanding users
     - Working with the run-as user
 - NP DDD - 84: Self-healing containers with restart policies

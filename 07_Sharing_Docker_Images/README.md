@@ -18,6 +18,10 @@ The **default registry is Docker Hub**, and the **default tag is latest**. Docke
 
 **Tags are used to identify different versions of the same application.** If you don’t specify a tag when you create an image, Docker uses the default tag `latest`. That's a misleading name, because the image tagged “latest” might not actually be the most recent image version. When you push your own images, you should **always tag them with explicit versions**.
 
+> When you’re looking for software to install, always pay careful attention
+to the tags offered in a repository. Many repositories publish multiple
+releases of their software, sometimes on multiple operating systems or in full or slim versions to support different use cases. Consult the repository's documentation for specifics of what the repository's tags mean and the image release practices.
+
 ## Create a repo on Docker Hub
 
 A Docker ID allows you to access Docker Hub which is the world’s largest library and community for container images.
