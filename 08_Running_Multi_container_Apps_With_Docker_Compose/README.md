@@ -20,6 +20,14 @@ Modern cloud-native apps are made of **multiple smaller services** that interact
 - Instead of gluing each microservice together with scripts and long docker commands, Docker Compose lets you describe an entire app in a **single declarative configuration file**, and deploy it with a single command.
 - Once the app is deployed, you can **manage its entire lifecycle** with a simple set of commands. You can even store and manage the configuration file in a **version control system**.
 
+Main features of Compose:
+- **Multiple isolated environments on a single host**: Compose uses a project name to isolate environments from each other. It prevents different projects and service from interfering with each other.
+- **Preserve volume data when containers are created**: Compose preserves all volumes used by your services.
+- **Only recreate containers that have changed**: Compose caches the configuration used to create a container.
+- **Variables and moving a composition between environments**: Compose supports variables in the Compose file. You can use these variables to customize your composition for different environments, or different users.
+- **Portability**: Docker Compose lets you bring up a complete development environment with only one command. This allows us developers to keep our development environment in one central place and helps us to easily deploy our applications.
+
+
 ## Running a application with Compose: counter-app
 
 Compose uses YAML files to define multi-service applications. The default name for a Compose YAML file is `docker-compose.yml`. However, you can use the `-f` flag to specify custom filenames.
@@ -46,6 +54,7 @@ Each of these defines a service (container) in the app. It’s important to unde
     > Note: Technically speaking, we don’t need the command: python app.py option. this is because the application’s Dockerfile already defines python app.py as the default app for the image. However, we’re showing it here so you know how it works. You can also use Compose to override CMD instructions set in Dockerfiles.
     - `ports`: Tells Docker to map port 5000 inside the container to port 80 on the host. This means that traffic sent to the Docker host on port 80 will be directed to port 5000 on the container. The app inside the container listens on port 5000.
     - `networks`: Tells Docker which network to attach the service’s container to. The network should already exist, or be defined in the networks top-level key.
+    > By default Compose sets up a single network for your app. Each container for a service joins the default network and is both reachable by other containers on that network, and discoverable by them at a hostname identical to the container name.
 - `redis`
     - `image: redis:alpine`: this tells Docker to start a standalone container called redis based on the redis:alpine image. This image will be pulled from Docker Hub.
     - `networks`: The redis container will be attached to the counter-net network.
@@ -58,7 +67,11 @@ Check the files (`cd ~/docker-k8s/08_Running_Multi_container_Apps_With_Docker_Co
 - `requirements.txt`: lists the Python packages required for the app
 - `Dockerfile`: describes how to build the image for the web-fe service
 
+> **Handling transient errors:** Note the way the get_hit_count function is written. This basic retry loop lets us attempt our request multiple times if the redis service is not available. This is useful at startup while the application comes online, but also makes our application more resilient if the Redis service needs to be restarted anytime during the app’s lifetime. In a cluster, this also helps handling momentary connection drops between nodes.
+
 Compose will also use the name of the directory (01-counter-app) as the project name.
+
+> You can override the project name with either the `--project-name` flag or the `COMPOSE_PROJECT_NAME` environment variable.
 
 Let’s use Compose to bring the app up: `sudo docker compose up`. 
 - It’ll take a few seconds for the app to come up, and the output can be quite verbose.
@@ -84,4 +97,41 @@ Managing an app with Compose:
 - `sudo docker compose ps`
 - `sudo docker compose down -v`: Stop and delete the app and the volumes
 
+## Development with Compose
+
+
+Edit `docker-compose.dev.yml` in your project directory to add a bind mount for the web service:
+
+
+```yml
+version: '3'
+services:
+  web:
+    build: ./composetest
+    ports:
+      - "80:5000"
+    volumes:
+      - ./composetest:/code
+    environment:
+      FLASK_ENV: development
+  redis:
+    image: "redis:alpine"
+```
+The new volumes key mounts the project directory (current directory) on the host to /code inside the container, allowing you to modify the code on the fly, without having to rebuild the image. The environment key sets the FLASK_ENV environment variable, which tells flask run to run in development mode and reload the code on change. This mode should only be used in development.
+
+From your project directory, type docker-compose up to build the app with the updated Compose file, and run it.
+
+    docker-compose -f docker-compose.dev.yml up
+
+Check the Hello World message in a web browser again, and refresh to see the count increment.
+
+Because the application code is now mounted into the container using a volume, you can make changes to its code and see the changes instantly, without having to rebuild the image.
+
+Change the greeting in app.py and save it. For example, change the Hello World! message to Hello from Docker!:
+
+return 'Hello from Docker! I have been seen {} times.\n'.format(count)
+
+Refresh the app in your browser. The greeting should be updated, and the counter should still be incrementing.
+
+## Production deployment with Compose: counter-app
 
