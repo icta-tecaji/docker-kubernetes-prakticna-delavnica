@@ -99,39 +99,21 @@ Managing an app with Compose:
 
 ## Development with Compose
 
+We can use Copose in the devlopment stage for our apps:
+- Move to: `cd ~/docker-k8s/08_Running_Multi_container_Apps_With_Docker_Compose/examples/02-counter-app-dev`
+- Check the `docker-compose.dev.yml` file in your project directory.
+  - The new volumes key mounts the project directory (current directory) on the host to `/code` inside the container, **allowing you to modify the code on the fly, without having to rebuild the image**. 
+  - The environment key sets the `FLASK_ENV` environment variable, which tells flask run to run in development mode and **reload the code on change**. This mode should only be used in development.
 
-Edit `docker-compose.dev.yml` in your project directory to add a bind mount for the web service:
+From your project directory, type docker compose up to build the app with the updated Compose file, and run it.
 
+    docker compose -f docker-compose.dev.yml up
 
-```yml
-version: '3'
-services:
-  web:
-    build: ./composetest
-    ports:
-      - "80:5000"
-    volumes:
-      - ./composetest:/code
-    environment:
-      FLASK_ENV: development
-  redis:
-    image: "redis:alpine"
-```
-The new volumes key mounts the project directory (current directory) on the host to /code inside the container, allowing you to modify the code on the fly, without having to rebuild the image. The environment key sets the FLASK_ENV environment variable, which tells flask run to run in development mode and reload the code on change. This mode should only be used in development.
-
-From your project directory, type docker-compose up to build the app with the updated Compose file, and run it.
-
-    docker-compose -f docker-compose.dev.yml up
-
-Check the Hello World message in a web browser again, and refresh to see the count increment.
+Check the page in a web browser again, and refresh to see the count increment.
 
 Because the application code is now mounted into the container using a volume, you can make changes to its code and see the changes instantly, without having to rebuild the image.
 
-Change the greeting in app.py and save it. For example, change the Hello World! message to Hello from Docker!:
-
-return 'Hello from Docker! I have been seen {} times.\n'.format(count)
-
-Refresh the app in your browser. The greeting should be updated, and the counter should still be incrementing.
+Change the greeting in app.py and save it. Refresh the app in your browser. The greeting should be updated, and the counter should still be incrementing.
 
 ## Production deployment with Compose: counter-app
 

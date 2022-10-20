@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  web-fe:
+    build: .
+    command: python app.py
+    ports:
+      - "80:5000"
+    networks:
+      - counter-net
+    # dodano
+    volumes:
+      - .:/code
+    # dodano
+    environment:
+      FLASK_DEBUG: "true"
+  redis:
+    image: "redis:alpine"
+    networks:
+      counter-net:
+    volumes:
+      - "redis-data:/data"
+
+networks:
+  counter-net:
+
+volumes:
+  redis-data:

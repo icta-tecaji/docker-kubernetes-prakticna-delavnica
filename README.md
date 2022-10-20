@@ -89,6 +89,8 @@
 - Overview of Docker Compose and installation
 - Compose background
 - Running a application with Compose: counter-app
+- Development with Compose
+- 
 
 
 
