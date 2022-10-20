@@ -1,7 +1,7 @@
 # Running Multi-container Apps With Docker Compose
 
 ## Overview of Docker Compose and installation
-Compose is a tool for defining and running multi-container Docker applications in single-engine mode. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration. 
+Compose is a tool for defining and running **multi-container Docker applications in single-engine mode**. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration. 
 
 > **Compose V2 and the new docker compose command**: The new Compose V2, which supports the `compose` command as part of the Docker CLI, is now available. Compose V2 integrates compose functions into the Docker platform, continuing to support most of the previous `docker-compose` features and flags. You can run Compose V2 by replacing the hyphen (-) with a space, using `docker compose`, instead of `docker-compose`. [Compose command compatibility with docker-compose](https://docs.docker.com/compose/cli-command-compatibility/).
 
@@ -14,11 +14,14 @@ Compose is a tool for defining and running multi-container Docker applications i
 Use the following command to ckeck that Compose is installed: `docker compose version`
 
 ## Compose background
+Most applications don’t run in one single component. Even large old apps are typically built as frontend and backend components, which are separate logical layers running in physically distributed components.
+
 Modern cloud-native apps are made of **multiple smaller services** that interact to form a useful app. We call this pattern **“microservices”**. A simple example might be an app with the following seven services: Web front-end, Ordering, Catalog, Back-end database, Logging, Authentication, Authorization.
 - Get all of these working together, and you have a useful application.
 - **Deploying and managing lots of small microservices** like these can be hard. this is where Docker Compose comes in to play.
 - Instead of gluing each microservice together with scripts and long docker commands, Docker Compose lets you describe an entire app in a **single declarative configuration file**, and deploy it with a single command.
 - Once the app is deployed, you can **manage its entire lifecycle** with a simple set of commands. You can even store and manage the configuration file in a **version control system**.
+- Very neat way of describing the setup for complex distributed apps in a small, clear file format.
 
 Main features of Compose:
 - **Multiple isolated environments on a single host**: Compose uses a project name to isolate environments from each other. It prevents different projects and service from interfering with each other.
@@ -27,6 +30,7 @@ Main features of Compose:
 - **Variables and moving a composition between environments**: Compose supports variables in the Compose file. You can use these variables to customize your composition for different environments, or different users.
 - **Portability**: Docker Compose lets you bring up a complete development environment with only one command. This allows us developers to keep our development environment in one central place and helps us to easily deploy our applications.
 
+**The Docker Compose file describes the desired state of your app—what it should look like when everything’s running.**
 
 ## Running a application with Compose: counter-app
 
@@ -60,7 +64,7 @@ Each of these defines a service (container) in the app. It’s important to unde
     - `networks`: The redis container will be attached to the counter-net network.
     - `volumes`: Tells Docker to mount the redis-data volume to /data inside the container. The redis-data volume needs to already exist, or be defined in the volumes top-level key at the bottom of the file.
 
-As both services will be deployed onto the same counter-net network, they **will be able to resolve each other by name**. This is important as the application is configured to communicate with the redis service by name.
+The service name becomes the container name and the DNS name of the container, which other containers can use to connect on the Docker network. As both services will be deployed onto the same counter-net network, they **will be able to resolve each other by name**. This is important as the application is configured to communicate with the redis service by name.
 
 Check the files (`cd ~/docker-k8s/08_Running_Multi_container_Apps_With_Docker_Compose/examples/01-counter-app`):
 - `app.py`: is the application code (a Python Flask app)
@@ -91,6 +95,8 @@ It’s also common to use the `-d` flag to bring the app up in the background: `
 Managing an app with Compose:
 - `sudo docker compose ps`: Show the current state of the app
 - `sudo docker compose top`: List the processes running inside of each service (The PID numbers returned are the PID numbers as seen from the Docker host (not from within the containers).)
+- `sudo docker compose logs`: Show the apps logs.
+- `sudo docker compose logs -f`: Follow log output.
 - `sudo docker compose stop`: Stop the app without deleting its resource
 - `sudo docker compose ps`
 - `sudo docker compose restart`: Restart the app
@@ -133,3 +139,41 @@ Moving along, for production environments, we need to add the following:
 - Run the app: `docker compose -f docker-compose.prod.yml up`
 - Stop the app: `docker compose -f docker-compose.prod.yml down -v`
 
+## Scaling and Load Balancing using Compose
+
+Each service defined in Docker compose configuration can be scaled. The `web-fe` service is effectively stateless, so you can scale it up to run on multiple containers. When the `nginx` container requests data from the `web-fe`, Docker will share those requests across the running `web-fe` containers.
+
+In the same terminal session, use Docker Compose to increase the scale of the `web-fe` service, and then refresh the web page a few times and check the hostname of the containers:
+- `docker compose -f docker-compose.prod.yml up -d`
+- `docker compose -f docker-compose.prod.yml ps`
+- Scale up: `docker compose -f docker-compose.prod.yml up -d --scale web-fe=3`
+- `docker compose -f docker-compose.prod.yml ps`
+
+Docker Compose is a client-side tool. It’s a command line that sends instructions to the Docker API based on the contents of the Compose file. Docker itself just runs containers; it isn’t aware that many containers represent a single application. Only Compose knows that, and Compose only knows the structure of your application by looking at the Docker Compose YAML file, so you need to have that file available to manage your app.
+
+> It’s possible to get your application out of sync with the Compose file, such as when the Compose file changes or you update the running app. That can cause unexpected behavior when you return to manage the app with Compose.
+
+Containers plugged into the same Docker network will get IP addresses in the same network range, and they connect over that network. Using DNS means that when your containers get replaced and the IP address changes, your app still works because the DNS service in Docker will always return the current container’s IP address from the domain lookup.
+
+Connect to a session in the `nginx` container and perform a DNS lookup: `docker container exec -it 03-counter-app-prod-nginx-1 sh`
+- `nslookup web-fe`
+- `ping web-fe` 
+- `ping web-fe` 
+- `ping web-fe`
+
+In the DNS lookup for the `web-fe`, you can see that three IP addresses are returned, one for each of the three containers in the service.
+
+DNS servers can return multiple IP address for a domain name. Docker Compose uses this mechanism for simple load-balancing, returning all the container IP addresses for a service. It’s up to the application that makes the DNS lookup how it processes multiple responses; some apps take a simplistic approach of using the first address in the list. 
+
+To try to **provide load-balancing across all the containers**, the Docker DNS returns the list in a different order each time. 
+- `nslookup web-fe`
+- `nslookup web-fe`
+- `nslookup web-fe`
+- `exit`
+
+You’ll see that if you repeat the nslookup call - it’s a basic way of trying to spread traffic around all the containers.
+
+Few more steps:
+- Scale down: `docker compose -f docker-compose.prod.yml up -d --scale web-fe=1`
+- `docker compose -f docker-compose.prod.yml ps`
+- Stop the app: `docker compose -f docker-compose.prod.yml down -v`

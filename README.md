@@ -91,9 +91,7 @@
 - Running a application with Compose: counter-app
 - Development with Compose
 - Production deployment with Compose: counter-app
-- 
-
-
+- Scaling and Load Balancing using Compose
 
 ## [Del 9: Docker Reliability And Health Checks](./09_Docker_Reliability_And_Health_Checks/README.md)
 - running processes as pid 1
