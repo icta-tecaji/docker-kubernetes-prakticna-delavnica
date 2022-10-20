@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.8"
 services:
   nginx:
     build: 
@@ -7,30 +7,29 @@ services:
     ports:
       - 80:8080
     depends_on:
-      - web
+      - web-fe
     networks:
       - frontend
-  web:
+  web-fe:
     image: leon11sj/counter
     entrypoint: ["gunicorn", "--bind", "0.0.0.0:5000", "wsgi:app"]
-    expose:
-      - 5000
     networks:
       - backend
       - frontend
     depends_on:
       - redis
+    environment:
+      FLASK_DEBUG: "true"
   redis:
     image: "redis:alpine"
-    volumes:
-      - redis-data:/data
-    networks:  
+    networks:
       - backend
-    
+    volumes:
+      - "redis-data:/data"
 
 networks:
-  frontend:
   backend:
-  
+  frontend:
+
 volumes:
   redis-data:

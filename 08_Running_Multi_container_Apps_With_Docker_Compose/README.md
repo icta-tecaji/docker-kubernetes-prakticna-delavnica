@@ -115,5 +115,21 @@ Because the application code is now mounted into the container using a volume, y
 
 Change the greeting in app.py and save it. Refresh the app in your browser. The greeting should be updated, and the counter should still be incrementing.
 
+Stop the service: `docker compose -f docker-compose.dev.yml down`
+
 ## Production deployment with Compose: counter-app
+
+Moving along, for production environments, we need to add the following:
+- Move to folder: `cd ~/docker-k8s/08_Running_Multi_container_Apps_With_Docker_Compose/examples/03-counter-app-prod`
+- Add gunicorn (a production-grade WSGI server) to `requirements.txt`
+- Let’s create a `wsgi.py` file that will serve as the entry point for our application. This will tell our Gunicorn server how to interact with the application.
+- A new Dockerfile called `Dockerfile.prod` for use with production builds. We used a Docker multi-stage build to reduce the final image size. Essentially, builder is a temporary image that's used for building the Python wheels. The wheels are then copied over to the final production image and the builder image is discarded.
+- Build the image: `sudo docker build -t leon11sj/counter -f ./Dockerfile.prod .`
+- Create a new Compose file called `docker-compose.prod.yml` for production.
+  - Add new networks
+  - `depends_on` expresses startup and shutdown dependencies between services.
+  - `entrypoint` overrides the default entrypoint for the Docker image.
+  - Add Nginx into the mix to act as a reverse proxy for Gunicorn to handle client requests as well as serve up static files.
+- Run the app: `docker compose -f docker-compose.prod.yml up`
+- Stop the app: `docker compose -f docker-compose.prod.yml down -v`
 

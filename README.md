@@ -90,6 +90,7 @@
 - Compose background
 - Running a application with Compose: counter-app
 - Development with Compose
+- Production deployment with Compose: counter-app
 - 
 
 
