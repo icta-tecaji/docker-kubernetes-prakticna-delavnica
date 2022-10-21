@@ -94,22 +94,16 @@
 - Scaling and Load Balancing using Compose
 
 ## [Del 9: Docker Reliability And Health Checks](./09_Docker_Reliability_And_Health_Checks/README.md)
-- running processes as pid 1
-- https://docs.docker.com/engine/reference/builder/#exec-form-entrypoint-example
-- https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#entrypoint
-- Resource control
-- Setting resource allowances
-    - Memory limits
-    - CPU
-    - Access to devices
-- Sharing memory
-- Restarting containers
-- Understanding users
-    - Working with the run-as user
-- NP DDD - 84: Self-healing containers with restart policies
+- Self-healing containers with restart policies
+- Using restart policies in Docker Compose
+- Understanding PID 1 in Docker containers
+- Docker Resource Management
+- Building health checks into Docker images
+
 
 ## [Del 10: Managing Application Logs](./10_Managing_Application_Logs/README.md)
 - https://sematext.com/guides/docker-logs/
+- https://docs.docker.com/config/containers/logging/configure/
 
 ## [Del 11: Monitoring](./11_Monitoring/README.md)
 - Portainer
