@@ -1,0 +1,12 @@
+FROM python:3.9-alpine
+
+RUN apk update && apk add curl
+
+ADD . /code
+WORKDIR /code
+RUN pip install -r requirements.txt
+
+HEALTHCHECK --interval=5s --timeout=3s \
+  CMD curl --fail http://localhost:5000/health
+
+CMD ["python", "app.py"]

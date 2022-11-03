@@ -1,6 +1,7 @@
 # Docker Reliability And Health Checks
 
 ## Self-healing containers with restart policies
+Docker monitors the health of your app at a basic level every time you run a container. Containers run a specific process when they start and Docker **checks that the process is still running**, and if it stops, the container goes into the exited state. That gives you a basic health check that works across all environments. Developers can see that their app is unhealthy if the process fails and the container exits.
 
 It’s often a good idea to **run containers with a restart policy**. This is a form of self-healing that enables Docker to **automatically restart them after certain events or failures** have occurred.
 
@@ -136,6 +137,66 @@ Physical system resources such as memory and time on the CPU are scarce. If the 
 
 In production you’ll run your apps in a container platform like Docker Swarm or Kubernetes, and those **platforms have features that help you deploy self-healing apps**. You can package your containers with information the platform uses to **check if the application inside the container is healthy**. If the app stops working correctly, the platform can remove a malfunctioning container and replace it with a new one.
 
+Checking if the container exits it’s a very basic check — it ensures the process is running, but **not that the app is actually healthy**. A web app in a container could hit maximum capacity and start returning HTTP 503 “Service Unavailable” responses to every request, but as long as the process in the container is still running, Docker thinks the container is healthy, even though the app is stalled.
+
+Docker gives you a neat way to build a real application health check right into the Docker image, just by adding logic to the Dockerfile. We’ll do that with a simple API container, but first we’ll run it without any health checks to be sure we understand the problem.
+
+Run a container that hosts a simple REST API that returns a random number. The app has a bug, so after few calls to the API, it becomes unhealthy and every subsequent call fails.
+- Move to: `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/05_rnd_number`
+- Look at the files
+- Build the image: `docker build -t random-number-api .`
+- Run the app: `docker container run -d --name rnd-api -p 80:5000 random-number-api`
+- Run it multiple time from terminal: 
+    - `curl -i http://localhost/health`
+    - `curl -i http://localhost/rng` (run 5x)
+    - `curl -i http://localhost/health`
+    - The API behaves correctly for the first five calls,
+and then it returns an HTTP 500 “Internal Server Error” response.
+- Check the container status: `docker ps`
+    - In the container list, the API container has the status Up.
+    - The process inside the container is still running, so it looks good as far as Docker is concerned. The container runtime has no way of knowing what’s happening inside that process and whether the app is still behaving correctly.
+- Stop and remove the app: `docker rm -f rnd-api`
+
+Enter the `HEALTHCHECK` instruction, which you can add to a Dockerfile to tell the runtime exactly how to check whether the app in the container is still healthy. The `HEALTHCHECK` instruction **specifies a command for Docker to run inside the container**, which will return a status code—the command can be anything you need to check if your app is healthy. Docker will run that command in the container at a timed interval. 
+- If the status code says everything is good, then the container is healthy.
+- If the status code is a failure several times in a row, then the container is marked as unhealthy.
+
+> [The `HEALTHCHECK`](https://docs.docker.com/engine/reference/builder/#healthcheck) instruction tells Docker how to test a container to check that it is still working. This can detect cases such as a web server that is stuck in an infinite loop and unable to handle new connections, even though the server process is still running.
+
+Add the `HEALTHCHECK` command in a new Dockerfile for the random
+number API. This health check uses a curl command like I did on my host, but this time it runs inside the container. The `/health` URL is another endpoint in the application that checks if the bug has been triggered; it will return a 200 “OK” status code if the app is working and a 500 “Internal Server Error” when it’s broken.
+
+The health check makes an HTTP call to the /health endpoint, which the API provides to test if the app is healthy. Using the `--fail` parameter means the curl command will pass the status code on to Docker — if the request succeeds, it returns the number 0, which Docker reads as a successful check. If it fails, it returns a number other than 0, which means the health check failed.
+
+You can configure how often the health check runs and how many failed checks mean the app is unhealthy. The default is to run every 30 seconds, and for three failures in a row to trigger the unhealthy status.
+The options that can appear before CMD are:
+- `--interval=DURATION` (default: 30s): The health check will first run interval seconds after the container is started, and then again interval seconds after each previous check completes.
+- `--timeout=DURATION` (default: 30s): If a single run of the check takes longer than timeout seconds then the check is considered to have failed.
+- `--start-period=DURATION` (default: 0s): start period provides initialization time for containers that need time to bootstrap. Probe failure during that period will not be counted towards the maximum number of retries.
+- `--retries=N` (default: 3): It takes retries consecutive failures of the health check for the container to be considered unhealthy.
+
+Run the same test but using the new image:
+- Look at the files
+- Build the app: `docker build -t random-number-api-health -f Dockerfile.health .`
+- Run the app: `docker container run -d --name rnd-api-health -p 80:5000 random-number-api-health`
+- Wait 30 seconds or so and list the containers: `docker ps`
+    - You can see that the new version of the API container initially shows a healthy status.
+- Run it multiple time from terminal: 
+    - `curl -i http://localhost/health`
+    - `curl -i http://localhost/rng` (run 5x)
+    - `curl -i http://localhost/health`
+- Run: `docker ps`
+    - That **unhealthy status** is published as an event from Docker’s API, so the platform running the container is notified and can take action to fix the application.
+- Docker also records the result of the most recent health checks, which you can see when you inspect the container: `docker container inspect rnd-api-health`
+- Stop and remove the app: `docker rm -f rnd-api-health`
+
+The health check is doing what it should: testing the application inside the container and flagging up to Docker that the app is no longer healthy.
+
+**Why hasn’t Docker restarted or replaced that container?** 
+- Docker can’t safely do that, because the Docker Engine is running on a single server. 
+- Docker could stop and restart that container, but that would mean downtime for your app while it was being recycled. Or Docker could remove that container and start a new one from the same setup, but maybe your app writes data inside the container, so that would mean downtime and a loss of data.
+- Docker can’t be sure that taking action to fix the unhealthy container won’t make the situation worse, so it broadcasts that the container is unhealthy but leaves it running.
+- Health checks **become really useful in a cluster with multiple servers running Docker** being managed by Docker Swarm or Kubernetes.
 
 ## Starting containers with dependency checks
 

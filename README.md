@@ -99,7 +99,7 @@
 - Understanding PID 1 in Docker containers
 - Docker Resource Management
 - Building health checks into Docker images
-
+- Starting containers with dependency checks
 
 ## [Del 10: Managing Application Logs](./10_Managing_Application_Logs/README.md)
 - https://sematext.com/guides/docker-logs/
