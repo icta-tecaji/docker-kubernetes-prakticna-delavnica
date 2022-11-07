@@ -129,7 +129,7 @@ Physical system resources such as memory and time on the CPU are scarce. If the 
 
 - https://docs.docker.com/config/containers/resource_constraints/
 - https://tbhaxor.com/docker-resource-management-in-detail/
-
+- Sharing memory
 
 
 
@@ -138,6 +138,8 @@ Physical system resources such as memory and time on the CPU are scarce. If the 
 In production you’ll run your apps in a container platform like Docker Swarm or Kubernetes, and those **platforms have features that help you deploy self-healing apps**. You can package your containers with information the platform uses to **check if the application inside the container is healthy**. If the app stops working correctly, the platform can remove a malfunctioning container and replace it with a new one.
 
 Checking if the container exits it’s a very basic check — it ensures the process is running, but **not that the app is actually healthy**. A web app in a container could hit maximum capacity and start returning HTTP 503 “Service Unavailable” responses to every request, but as long as the process in the container is still running, Docker thinks the container is healthy, even though the app is stalled.
+
+> The health check is an ongoing test that helps the container platform keep your application running.
 
 Docker gives you a neat way to build a real application health check right into the Docker image, just by adding logic to the Dockerfile. We’ll do that with a simple API container, but first we’ll run it without any health checks to be sure we understand the problem.
 
@@ -196,10 +198,56 @@ The health check is doing what it should: testing the application inside the con
 - Docker can’t safely do that, because the Docker Engine is running on a single server. 
 - Docker could stop and restart that container, but that would mean downtime for your app while it was being recycled. Or Docker could remove that container and start a new one from the same setup, but maybe your app writes data inside the container, so that would mean downtime and a loss of data.
 - Docker can’t be sure that taking action to fix the unhealthy container won’t make the situation worse, so it broadcasts that the container is unhealthy but leaves it running.
-- Health checks **become really useful in a cluster with multiple servers running Docker** being managed by Docker Swarm or Kubernetes.
+- Health checks **become really useful in a cluster with multiple servers running Docker being managed by Docker Swarm or Kubernetes**.
 
 ## Starting containers with dependency checks
 
+Running across a cluster brings new challenges for distributed apps, because you can no longer **control the startup order for containers that may have dependencies on each other**.
+
+In a clustered container platform, however, **you can’t dictate the startup order** of the containers, so for example the web app might start before the API is available. What happens then depends on your application.
+
+Then run the web app container and browse to it. The container is up and the app is available, but you’ll find it doesn’t actually work.
+- Move to folder: `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/06_rnd_number_web`
+- Build the web container: `docker build -t random-number-web .`
+- Create a network: `docker network create --attachable rnd-net`
+- Run the web container: `docker run -d -p 80:5000 --network rnd-net --name rnd-number-web random-number-web`
+- `docker ps`
+- Try to open the webpage. You’ll see a simple web app that looks OK, but the number service is unavailable.
+    - This is exactly what you don’t want to happen. The container looks fine, but the app is unusable because its key dependency is unavailable. Some apps may have logic built into them to verify that the dependencies they need are there when they start, but most apps don’t, and the random number web app is one of those. It assumes the API will be available when it’s needed, so it doesn’t do any dependency checking.
+- Stop the container: `docker rm -f rnd-number-web`
+
+You can add that **dependency check inside the Docker image**. A dependency
+check is different from a health check — **it runs before the application starts and makes sure everything the app needs is available.**
+    - If everything is there, the dependency check finishes successfully and the app starts. 
+    - If the dependencies aren’t there, the check fails and the container exits
+    
+Docker doesn’t have a built-in feature like the `HEALTHCHECK` instruction for dependency checks, but you can put that logic in the startup command.
+- Look at the `Dockerfile.check` file.
+- Build the image: `docker build -t random-number-web-check -f Dockerfile.check .`
+- Run the container: `docker run -p 80:5000 --network rnd-net --name rnd-number-web-check random-number-web-check`
+- `docker ps -a`
+- The CMD instruction runs when a container starts, and it makes an HTTP call to the API, which is a simple check to make sure it’s available. 
+    - If the API is available, the curl command will succeed and the application gets launched.
+    - If the API is unavailable, the curl command will fail, the command won’t run, and nothing happens in the container so it exits.
+- `docker rm -f rnd-number-web-check`
+
+It’s counterintuitive, but in this scenario it’s **better to have an exited container than a running container.**
+
+This is fail-fast behavior, and it’s what you want when
+you’re running at scale. When a container exits, the platform can schedule a new container to come up and replace it.
+
+
+
+
+
+
+
+
+
+
+
+After:
+- remove network
 
 ## Defining health checks and dependency checks in Docker Compose
 
@@ -214,9 +262,3 @@ The health check is doing what it should: testing the application inside the con
 ## OTHER
 
 
-- running processes as pid 1
-
-
-- Sharing memory
-- Understanding users
-    - Working with the run-as user
