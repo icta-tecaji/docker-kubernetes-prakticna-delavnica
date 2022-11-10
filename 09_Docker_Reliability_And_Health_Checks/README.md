@@ -148,12 +148,12 @@ Run a container that hosts a simple REST API that returns a random number. The a
 - Look at the files
 - Build the image: `docker build -t random-number-api .`
 - Run the app: `docker container run -d --name rnd-api -p 80:5000 random-number-api`
+- Check the container status: `docker ps`
 - Run it multiple time from terminal: 
     - `curl -i http://localhost/health`
     - `curl -i http://localhost/rng` (run 5x)
     - `curl -i http://localhost/health`
-    - The API behaves correctly for the first five calls,
-and then it returns an HTTP 500 “Internal Server Error” response.
+    - The API behaves correctly for the first five calls, and then it returns an HTTP 500 “Internal Server Error” response.
 - Check the container status: `docker ps`
     - In the container list, the API container has the status Up.
     - The process inside the container is still running, so it looks good as far as Docker is concerned. The container runtime has no way of knowing what’s happening inside that process and whether the app is still behaving correctly.
@@ -230,35 +230,44 @@ Docker doesn’t have a built-in feature like the `HEALTHCHECK` instruction for 
     - If the API is available, the curl command will succeed and the application gets launched.
     - If the API is unavailable, the curl command will fail, the command won’t run, and nothing happens in the container so it exits.
 - `docker rm -f rnd-number-web-check`
+- `docker network rm rnd-net`
 
 It’s counterintuitive, but in this scenario it’s **better to have an exited container than a running container.**
 
-This is fail-fast behavior, and it’s what you want when
-you’re running at scale. When a container exits, the platform can schedule a new container to come up and replace it.
+This is fail-fast behavior, and it’s what you want when you’re running at scale. When a container exits, the platform can schedule a new container to come up and replace it.
 
+Curl is a very useful tool for testing web apps and APIs. Any extra tools increase the image size, and they also increase the frequency of updates and the security attack surface. So although curl is a great tool for getting started with container checks, it’s better to **write a custom utility for your checks using the same language that your application uses.**
 
-
-
-
-
-
-
-
-
-
-After:
-- remove network
+There are a whole lot of advantages to this:
+- You reduce the software requirements in your image
+- You can use more complex conditional logic in your checks
+- Your utility can use the same application configuration that your app uses
+- You can execute any tests you need
+- It makes your image portable between different container platforms
 
 ## Defining health checks and dependency checks in Docker Compose
 
+Docker Compose can go some of the way toward repairing unreliable applications, but it won’t replace unhealthy containers for the same reasons that Docker Engine won’t: you’re running on a single server, and the fix might cause an outage. But it can **set containers to restart if they exit**, and it can **add a health check if there isn’t one already in the image**.
 
+Specifying health check parameters in a Docker Compose file:
+- Move to: `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/07_number_compose/`
+- Check the `docker-compose.yml` file
+    - You have fine-grained control over the health check. 
+    - You can also add a health check in your Compose file for containers that don’t have one declared in the image.
+    - It’s good to add a health check to all containers, but this example comes together with the dependency check in the image and the `restart: on-failure` setting, which means that if the container exits unexpectedly, Docker will restart it.
+- Start the app: `docker compose up -d`
+    - Compose creates both containers at the same time, because no dependencies are specified.
+    - You can see in my logs that the HTTP check returns a success code.
+    - The web service is configured to restart on failure, so that same container gets started again.
+- `docker compose ps`
+- `docker compose logs -f`
+- `docker compose ps`
+- Stop the app: `docker compose down`
 
+Why bother **building a dependency check into the container startup when Docker Compose can do it for you with the `depends_on` flag**?
+- Compose can only manage dependencies on a single machine, and the startup behavior of your app on a production cluster is far less predictable.
 
+> Building your app as a distributed system with lots of small components increases your flexibility and agility, but it does make management more complicated.
 
-
-
-
-
-## OTHER
-
+You do need to be **careful with your checks** though. Health checks run **periodically**, so they shouldn’t do too much work. You need to find the **balance** so checks are testing that key parts of your app are working without taking too long to run or **using too much compute resource**.
 

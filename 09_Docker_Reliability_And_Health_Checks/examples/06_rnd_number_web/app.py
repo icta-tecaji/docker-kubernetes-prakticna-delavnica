@@ -11,10 +11,11 @@ def get_rnd_number():
     try:
         number = requests.get(f"http://{api_host_and_port}/rng")
         if number.status_code == 200:
-            return int(number.get("number"))    
+            return int(number.json().get("number"))    
         else:
             return "Status error!"
-    except:
+    except BaseException as err:
+        print(err, flush=True)
         return "Service unavailable!"
 
 @app.route('/')
@@ -26,6 +27,10 @@ def hello():
     else:
         text = number
     return f"Pozdravljeni!\n {text}"
+
+@app.route('/health')
+def health():
+    return "Status OK."
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port= 5000, debug=True)

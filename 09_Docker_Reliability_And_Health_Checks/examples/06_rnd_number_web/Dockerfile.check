@@ -6,7 +6,7 @@ ADD . /code
 WORKDIR /code
 RUN pip install -r requirements.txt
 
-ENV RND_API_HOST_AND_PORT=rnd-api:5000
+ENV RND_API_HOST_AND_PORT=rnd-api-health:5000
 
-CMD curl --fail http://rnd-api-health/rng && \
+CMD curl --fail http://$RND_API_HOST_AND_PORT/rng && \
     python app.py

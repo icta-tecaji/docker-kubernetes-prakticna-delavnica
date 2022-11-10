@@ -16,9 +16,11 @@ def healthcheck():
 @app.route('/rng')
 def rng():
     global error_count
+    print(f"Generating random number. Counter: {error_count}", flush=True)
     if error_count < BREAK_APP_COUNTER:
         rnd_number = random.randint(0,20)
         error_count += 1
+        print(f"Random number: {rnd_number}", flush=True)
         return jsonify(number=rnd_number)
     else:
         raise ValueError("Error getting value")
