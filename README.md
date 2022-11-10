@@ -130,14 +130,14 @@
 ## [Del 15: Docker Exercises](./15_Docker_Exercises/README.md)
 - praktični primeri realnih aplikaciji
 
-## Del 16: Container orchestration and microservices
+## [Del 16: Container orchestration and microservices](./16_Container_orchestration_and_microservices/README.md)
 - Kubernetes vs Docker Swarm
 
-
-## Del 17: Introduction to Kubernetes
+## [Del 17: Introduction to Kubernetes](./17_Introduction_to_Kubernetes/README.md)
+- About Kubernetes
 - Kubernetes history
-- Kubernetes principles of operation
-- Kubernetes architecture
+
+
 
 ## Del 18: Kubernetes Pods
 - multicontainer Pods
