@@ -144,7 +144,6 @@
 - Should you even use Kubernetes?
 - How Kubernetes runs an application
 
-
 ## Del 18: Kubernetes Pods
 - multicontainer Pods
 - self-healing apps
