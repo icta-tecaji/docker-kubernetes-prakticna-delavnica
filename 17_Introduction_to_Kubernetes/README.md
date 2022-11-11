@@ -154,7 +154,6 @@ It is always recommended to upgrade the Kubernetes cluster to the latest availab
 <!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-1/v-14/17 -->
 
 
-
 ## Install Kubernetes
 If you want to run your applications on Kubernetes, you have to decide whether you want to run them **locally**, in your organization’s own infrastructure (on-premises) or with one of the major **cloud providers**, or perhaps both - in a **hybrid cloud solution**.
 
@@ -216,6 +215,7 @@ K3s provides an installation script that is a convenient way to install it as a 
 - Check the version: `k3s --version`
 - Run the following command to check that your cluster is up and running: `kubectl get nodes`
     - It’s a list of all the nodes in your cluster, with some basic details like the status and Kubernetes version.
+- To verify your cluster is working: `kubectl cluster-info`
 - [Quick-Start Guide](https://docs.k3s.io/quick-start)
 
 ## Should you even use Kubernetes?
@@ -234,4 +234,28 @@ K3s provides an installation script that is a convenient way to install it as a 
     - The initial excitement has just begun to calm down, but many engineers may still be unable to make rational decisions about whether the integration of Kubernetes is as necessary as it seems.
 
 ## How Kubernetes runs an application
-- https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-1/v-14/143
+
+1. **Defining your application**:
+    - Everything in Kubernetes is represented by an object.
+    - You create and retrieve these objects via the Kubernetes API.
+    - Your application consists of several types of these objects - one type represents the application deployment as a whole, another represents a running instance of your application, another represents the service provided by a set of these instances and allows reaching them at a single IP address, and there are many others.
+    - These objects are usually defined in one or more manifest files in either YAML or JSON format.
+
+> YAML was initially said to mean “Yet Another Markup Language”, but it was latter changed to the recursive acronym “YAML Ain’t Markup Language”. It’s one of the ways to serialize an object into a human-readable text file.
+    
+![Deploying an application to Kubernetes](./images/img12.png)
+<!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-1/v-14/17 -->
+
+2. **Submitting the application to the API**:
+    - After you’ve created your YAML or JSON file(s), you submit the file to the API, usually via the Kubernetes command-line tool called kubectl.
+    > Kubectl is pronounced kube-control, but the softer souls in the community prefer to call it kube-cuddle. Some refer to it as kube-C-T-L.
+    - Kubectl splits the file into individual objects and creates each of them by sending an HTTP PUT or POST request to the API, as is usually the case with RESTful APIs.
+    - The API Server validates the objects and stores them in the etcd datastore. In addition, it notifies all interested components that these objects have been created.
+
+These actions take place when you deploy the application:
+- You submit the application manifest to the Kubernetes API. The API Server writes the objects defined in the manifest to etcd.
+- A controller notices the newly created objects and creates several new objects - one for each application instance.
+- The Scheduler assigns a node to each instance.
+- The Kubelet notices that an instance is assigned to the Kubelet’s node. It runs the application instance via the Container Runtime.
+- The Kube Proxy notices that the application instances are ready to accept connections from clients and configures a load balancer for them.
+- The Kubelets and the Controllers monitor the system and keep the applications running.

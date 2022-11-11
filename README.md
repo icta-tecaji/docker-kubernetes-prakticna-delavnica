@@ -136,7 +136,13 @@
 ## [Del 17: Introduction to Kubernetes](./17_Introduction_to_Kubernetes/README.md)
 - About Kubernetes
 - Kubernetes history
-
+- Understanding Kubernetes
+- The benefits of using Kubernetes
+- Kubernetes architecture
+- Kubernetes versions
+- Install Kubernetes
+- Should you even use Kubernetes?
+- How Kubernetes runs an application
 
 
 ## Del 18: Kubernetes Pods
