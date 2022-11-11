@@ -24,9 +24,15 @@ Each microservice is now **a separate application with its own development and r
 
 Individual parts of the entire application **no longer need to run on the same computer**, which makes it **easier to scale the entire system**, but also means that the applications need to be configured to communicate with each other. When the system consists of many microservices, automated management is crucial.
 
+- **Bridging the dev and ops divide**:
+
 With the advent of the Dev-ops paradigm, the two teams now work much more closely together throughout the entire life of the software product. The development team is now much more involved in the daily management of the deployed software.
 
-- https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-1/v-14/61
+- **Standardizing the cloud**:
+
+Over the past decade or two, many organizations have moved their software from local servers to the cloud. Any company that wants to be able to move its applications from one provider to another will have to make additional, initially unnecessary efforts to abstract the infrastructure and APIs of the underlying cloud provider from the applications. This requires resources that could otherwise be focused on building the primary business logic.
+
+The popularity of Kubernetes has forced all major cloud providers to integrate Kubernetes into their offerings. Customers can now deploy applications to any cloud provider through a standard set of APIs provided by Kubernetes.
 
 
 ## Moving from monolithic apps to microservices
@@ -56,7 +62,8 @@ Container Orchestration envisions a number of features, some of which are mentio
 
 
 
-
+## Docker Swarm vs. Kubernetes
+- https://www.suse.com/c/rancher_blog/docker-swarm-vs-kubernetes/
 
 
 
