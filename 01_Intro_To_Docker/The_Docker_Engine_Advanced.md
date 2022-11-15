@@ -53,4 +53,5 @@ Once a container’s parent runc process exits, the associated containerd-shim p
 
 Some of the major functionality that still exists in the daemon includes; image management, image builds, the REST API, authentication, security, core networking, and orchestration.
 
-
+## Resources
+- [How does Docker run Containers Under the Hood](https://tbhaxor.com/how-do-docker-run-containers-under-the-hood/)

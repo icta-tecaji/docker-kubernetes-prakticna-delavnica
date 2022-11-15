@@ -20,7 +20,7 @@ Start a new interactive container, with the `--restart always` policy, and tell 
 - `docker ps`
 - Show running processes in container: `docker exec test-restart ps -a`
 - Kill the PID 1 process: `docker exec test-restart kill 1`
-- Docker will automatically restart it because it has the `--restart always` policy. If you issue a `docker
+    - Docker will automatically restart it because it has the `--restart always` policy. If you issue a `docker
 ps` command, you’ll see that the container’s uptime is less than the time since it was created.
 - `docker ps`
 - `docker exec test-restart ps -a`
@@ -34,12 +34,12 @@ state.
 Create the two new containers:
 - `docker container run -d --name always --restart always  alpine sleep 1d`
 - `docker container run -d --name unless-stopped --restart unless-stopped alpine sleep 1d`
-- `docker container ls`
+- `docker ps`
 - Stop both containers: `docker container stop always unless-stopped`
-- `docker container ls -a`
+- `docker ps -a`
 - Restart Docker: `sudo systemctl restart docker`
-- `docker container ls -a`
-- Notice that the “always” container has been restarted, but the “unlessstopped” container has not.
+- `docker ps -a`
+    - Notice that the “always” container has been restarted, but the “unlessstopped” container has not.
 - `docker rm -f always unless-stopped`
 
 Keep the following in mind when using restart policies:
@@ -47,26 +47,29 @@ Keep the following in mind when using restart policies:
 - If you manually stop a container, its restart policy is ignored until the Docker daemon restarts or the container is manually restarted. This is another attempt to prevent a restart loop.
 
 ## Using restart policies in Docker Compose
-- docker compose restart
 
-version: "3"
-services:
-myservice:
-<Snip>
-restart_policy:
-condition: always | unless-stopped | on-failure
+Docker Compose allows us to configure restart policies to manage multiple containers by using the restart keyword. `restart` defines the policy that the platform will apply on container termination.
+- `no`: The default restart policy. Does not restart a container under any circumstances.
+- `always`: The policy always restarts the container until its removal.
+- `on-failure`: The policy restarts a container if the exit code indicates an error.
+- `unless-stopped`: The policy restarts a container irrespective of the exit code but will stop restarting when the service is stopped
 
-Pokažemo kako kontejner pade, in kako ga lahko resetiramo
-- odkomentiramo //process.exit(0)
-- dodamao v docker-compose  restart: on-failure
-- pokažemo različne stop kode (npr, 1,2)
-
-
-
-
-
-
-
+Try the following:
+- Move to folder: `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/00_restart_polcy`
+- Check the `docker-compose.yml` file.
+- Run the app: `docker compose up --build`
+    - The container restarts after the error.
+- Stop the app: `docker compose down`
+- Change the `restart` filed to `on-failure` in the `docker-compose.yml` file.
+- Run the app: `docker compose up --build`
+- Check: `docker compose ps` and `docker compose logs -f`.
+    - The app is restarting
+- Stop the app: `docker compose down`
+- Uncomment the `sys.exit(0)` line in the `app.py` file.
+- Run the app: `docker compose up --build`
+- Check: `docker compose ps` and `docker compose logs`.
+    - The container exited and stopped (no restart).
+- Stop the app: `docker compose down`
 
 ## Understanding PID 1 in Docker containers
 
@@ -119,18 +122,19 @@ We can try with the following solution:
     - Look at the processes in the contianer: `docker exec app ps -aux`
     - Stop: `docker compose down`. The proccess shutdown gracefully.
 
-## Docker Resource Management
+## Docker Resource Management (Advanced)
 
 Physical system resources such as memory and time on the CPU are scarce. If the resource consumption of processes on a computer exceeds the available physical resources, the processes will experience performance issues and may stop running.
 
 **By default, a container has no resource constraints and can use as much of a given resource as the host’s kernel scheduler allows**. Docker provides ways to control how much memory, or CPU a container can use.
 
-> On Ubuntu or Debian hosts you may see messages similar to the following when working with an image: `Your kernel does not support cgroup swap limit capabilities`. Follow the instruction [here](https://docs.docker.com/engine/install/linux-postinstall/#your-kernel-does-not-support-cgroup-swap-limit-capabilities). Memory and swap accounting incur an overhead of about 1% of the total available memory and a 10% overall performance degradation, even if Docker is not running.
+Many of these features require your kernel to support Linux capabilities.
 
-- https://docs.docker.com/config/containers/resource_constraints/
-- https://tbhaxor.com/docker-resource-management-in-detail/
-- Sharing memory
+> On Ubuntu or Debian hosts you may see messages similar to the following when working with an image: `Your kernel does not support cgroup swap limit capabilities`. Follow the instruction [here](https://docs.docker.com/engine/install/troubleshoot/#kernel-cgroup-swap-limit-capabilities). Memory and swap accounting incur an overhead of about 1% of the total available memory and a 10% overall performance degradation, even if Docker is not running.
 
+- [Runtime options with Memory, CPUs, and GPUs](https://docs.docker.com/config/containers/resource_constraints/)
+- [resources](https://docs.docker.com/compose/compose-file/deploy/#resources) configures physical resource constraints for container to run on platform.
+- [Docker Resource Management in Detail](https://tbhaxor.com/docker-resource-management-in-detail/)
 
 
 ## Building health checks into Docker images

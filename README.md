@@ -97,7 +97,7 @@
 - Self-healing containers with restart policies
 - Using restart policies in Docker Compose
 - Understanding PID 1 in Docker containers
-- Docker Resource Management
+- Docker Resource Management (Advanced)
 - Building health checks into Docker images
 - Starting containers with dependency checks
 - Defining health checks and dependency checks in Docker Compose
