@@ -213,7 +213,7 @@ The top managed Kubernetes offerings include the following:
 K3s provides an installation script that is a convenient way to install it as a service on systemd or openrc based systems. To install K3s using this method, just run:
 - `curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" sh -s - --disable=traefik`
 - Check the version: `k3s --version`
-- Run the following command to check that your cluster is up and running: `kubectl get nodes`
+- Run the following command to check that your cluster is up and running: `kubectl get nodes -o wide`
     - It’s a list of all the nodes in your cluster, with some basic details like the status and Kubernetes version.
 - To verify your cluster is working: `kubectl cluster-info`
 - [Quick-Start Guide](https://docs.k3s.io/quick-start)
@@ -261,6 +261,75 @@ These actions take place when you deploy the application:
 - The Kubelets and the Controllers monitor the system and keep the applications running.
 
 ## Deploying your first application
-- img13
 
+To interact with Kubernetes, you use a command-line tool called kubectl, pronounced `kube-control`, `kube-C-T-L` or `kube-cuddle`. The tool communicates with the Kubernetes API server, which is part of the Kubernetes Control Plane. The control plane then triggers the other components to do whatever needs to be done based on the changes you made via the API.
 
+![How you interact with a Kubernetes cluster](./images/img14.png)
+<!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-3/v-14/152 -->
+
+To see more detailed information about a node, you use the kubectl describe command, which shows much more: `kubectl describe node <NODE_NAME>`. It displays the status of the node, information about its CPU and memory usage, system information, containers running on the node, and much more.
+
+Usually, to deploy an application, you’d prepare a JSON or YAML file describing all the components that your application consists of and apply that file to your cluster. This would be the **declarative approach**. We’ll use simple, one-line imperative commands to deploy your application.
+- `cd ~/docker-k8s/17_Introduction_to_Kubernetes/examples/test-app`
+- `docker build -t leon11sj/test-app .`
+- `docker push leon11sj/test-app`
+
+Let’s deploy the application to your Kubernetes cluster. Here’s the command that does this:
+- `kubectl create deployment test --image=leon11sj/test-app`
+
+In the command, you specify three things:
+- You want to create a deployment object.
+- You want the object to be called test.
+- You want the deployment to use the container image leon11sj/test-app.
+
+By default, the image is pulled from Docker Hub, but you can also specify the image registry in the image name.
+
+The **Deployment object** is now stored in the Kubernetes API. The existence of this object tells Kubernetes that the leon11sj/test-app container must run in your cluster. You’ve stated your desired state. Kubernetes must now ensure that the actual state reflects your wishes.
+
+The interaction with Kubernetes consists mainly of the **creation and manipulation of objects via its API**. You can view the status by reading back the object.
+- `kubectl get deployments`: The command lists all Deployment objects that currently exist in the cluster. You have only one Deployment in your cluster.
+
+In Kubernetes, instead of deploying individual containers, you deploy groups of co-located containers – so-called **pods**. A pod is a group of one or more closely related containers. You can think of each pod as a separate logical computer that contains one application. 
+- Listing pods: `kubectl get pods`
+    - This is the pod that houses the container running your application.
+If you simply want to see more information about the pod, you can also use the command: `kubectl describe pod <POD_NAME>`
+
+![How creating a Deployment object results in a running application container](./images/img15.png)
+<!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-3/v-14/152 -->
+
+Each pod gets its own IP address, but this address is internal to the cluster and not accessible from the outside. To make the pod **accessible externally, you’ll expose it by creating a Service object.**
+
+A service with the type LoadBalancer provisions an external load balancer, which makes the service accessible via a public IP.
+- Creating a Service: `kubectl expose deployment test --type=LoadBalancer --port 8080`
+
+This is what running the above command tells Kubernetes:
+- You want to expose all pods that belong to the test Deployment as a new service.
+- You want the pods to be accessible from outside the cluster via a load balancer.
+- The application listens on port 8080, so you want to access it via that port.
+
+Listing services: `kubectl get svc`
+
+The list shows two services with their types, IPs and the ports they expose. Ignore the kubernetes service for now and take a close look at the test service. 
+
+![What happens when you create a Service object of type LoadBalancer](./images/img16.png)
+<!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-3/v-14/152 -->
+
+The external IP is displayed. This means that the load balancer is ready to forward requests to your application for clients around the world. Open the webpage.
+
+One of the major benefits of running applications in containers is the ease with which you can scale your application deployments. You’re currently running a single instance of your application. Imagine you suddenly see many more users using your application. The single instance can no longer handle the load. You need to run additional instances to distribute the load and provide service to your users. This is known as **scaling out**.
+- Increasing the number of running application instances: `kubectl scale deployment test --replicas=5`
+
+You’ve now told Kubernetes that you want to run five exact copies or replicas of your pod. Note that you haven’t instructed Kubernetes what to do. You haven’t told it to add two more pods. You just set the new desired number of replicas and let Kubernetes determine what action it must take to reach the new desired state.
+- Seeing the results of the scale-out: `kubectl get deploy`
+- You can confirm this by listing pods: `kubectl get pods -o wide`
+- Try: `curl <IP>:<PORT>`
+
+Each request arrives at a different pod in random order. This is what services in Kubernetes do when more than one pod instance is behind them. They act as load balancers in front of the pods. 
+
+![Load balancing across multiple pods backing the same service](./images/img17.png)
+<!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-3/v-14/152 -->
+
+Remove the resources:
+- `kubectl delete svc test`
+- `kubectl delete deploy test`
+- `kubectl get pods`
