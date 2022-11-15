@@ -259,3 +259,8 @@ These actions take place when you deploy the application:
 - The Kubelet notices that an instance is assigned to the Kubelet’s node. It runs the application instance via the Container Runtime.
 - The Kube Proxy notices that the application instances are ready to accept connections from clients and configures a load balancer for them.
 - The Kubelets and the Controllers monitor the system and keep the applications running.
+
+## Deploying your first application
+- img13
+
+

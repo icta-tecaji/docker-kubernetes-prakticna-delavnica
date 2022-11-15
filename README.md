@@ -143,9 +143,15 @@
 - Install Kubernetes
 - Should you even use Kubernetes?
 - How Kubernetes runs an application
+- Deploying your first application
 
-## Del 18: Kubernetes Pods
-- multicontainer Pods
+## [Del 18: Kubernetes Pods](./18_Kubernetes_Pods/README.md)
+- Pod theory
+- Understanding pods
+- Sidecar containers
+- Creating pods
+
+
 - self-healing apps
 
 ## Del 19: Replication controllers
