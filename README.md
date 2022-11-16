@@ -194,7 +194,7 @@
 - [Docker Tips, Tricks and Tutorials](https://nickjanetakis.com/blog/tag/docker-tips-tricks-and-tutorials)
 - [Collabnix](https://collabnix.com/)
 - [Articles: Production-ready Docker packaging for Python developers](https://pythonspeed.com/docker/)
-
+- [Awesome Docker](https://github.com/veggiemonk/awesome-docker)
 
 
 
