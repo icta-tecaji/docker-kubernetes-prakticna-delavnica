@@ -211,7 +211,7 @@ The top managed Kubernetes offerings include the following:
 
 ### K3s installation
 K3s provides an installation script that is a convenient way to install it as a service on systemd or openrc based systems. To install K3s using this method, just run:
-- `curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" sh -s - --disable=traefik`
+- `curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" sh -`
 - Check the version: `k3s --version`
 - Run the following command to check that your cluster is up and running: `kubectl get nodes -o wide`
     - It’s a list of all the nodes in your cluster, with some basic details like the status and Kubernetes version.
