@@ -333,3 +333,7 @@ Remove the resources:
 - `kubectl delete svc test`
 - `kubectl delete deploy test`
 - `kubectl get pods`
+
+## Connect to the cluster from the local computer
+- https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/
+- https://docs.k3s.io/cluster-access
