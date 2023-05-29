@@ -150,7 +150,7 @@ The Kubernetes project maintains release branches for the most recent three mino
 
 It is always recommended to upgrade the Kubernetes cluster to the latest available stable version. There are several techniques such as rolling updates, and node pool migrations that allow you to complete an update with minimal disruption and downtime.
 
-![Support windows](./images/img11.png)
+![Support windows](https://upload.wikimedia.org/wikipedia/en/timeline/ss2e7boz2yrsj4ipyu6e9m44zv1fuo2.png)
 <!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-1/v-14/17 -->
 
 
