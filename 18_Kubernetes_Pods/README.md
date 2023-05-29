@@ -82,6 +82,74 @@ When deciding whether to use the sidecar pattern and place containers in a singl
 If the answer to all these questions is yes, put them all in the same pod. As a rule of thumb, **always place containers in separate pods unless a specific reason requires them to be part of the same pod.**
 
 ## Creating pods
+Pods and other Kubernetes objects are usually created by creating a JSON or YAML manifest file and posting it to the Kubernetes API.
+
+> The decision whether to use YAML or JSON to define your objects is yours. Most people prefer to use
+YAML because it’s slightly more human-friendly and allows you to add comments to the object definition.
+
+By using YAML files to define the structure of your application, you don’t need shell scripts to
+make the process of deploying your applications repeatable, and you can **keep a history of all
+changes** by storing these files in a VCS (Version Control System).
+
+### Creating a YAML manifest for a pod
+Now create an object manifest from scratch.
+- `cd docker-k8s/18_Kubernetes_Pods/examples/`
+- `cat 01_example.yaml`
+
+After you’ve prepared the manifest file for your pod, you can now create the object by posting the file to the Kubernetes API.
+
+When you post the manifest to the API, you are directing Kubernetes to apply the manifest to the cluster.
+- `kubectl apply -f 01_example.yaml`
+
+The `kubectl apply` command is used for creating objects as well as for making changes to existing objects.
+
+> If you later decide to make changes to your pod object, you can simply edit the file and run the apply command again. Some of the pod’s fields aren’t mutable, so the update may fail, but you can always delete the pod and then create it again.
+- `kubectl get pod myapp -o yaml`
+
+Let’s use the basic kubectl commands to see how the pod is doing:
+- `kubectl get pod`
+- `kubectl get pod -o wide`
+- `kubectl describe pod myapp`
+
+The following listing shows all the events that were logged after creating the pod.
+- `kubectl get events`
+
+No warning events are displayed, so everything seems to be fine.
+
+Let’s confirm that the application running in the container
+responds to your requests.
+
+For development, testing and debugging purposes, you may want to
+communicate directly with a specific pod, rather than using a service that forwards connections to randomly selected pods.
+
+You’ve learned that each pod is assigned its own IP address where it can be accessed by every other pod in the cluster. This IP address is typically internal to the cluster. You can’t access it from your local computer, except when Kubernetes is deployed in a specific way.
+1. GETTING THE POD’S IP ADDRESS:
+    - You can get the pod’s IP address by retrieving the pod’s full YAML and searching for the podIP field in the status section.
+    - `kubectl get pod myapp -o wide`
+2. GETTING THE PORT THE APPLICATION IS BOUND TO:
+    - If I wasn’t the author of the application, it would be difficult for me to find out which port the application listens on. I could inspect its source code or the Dockerfile of the container image, as the port is usually specified there, but I might not have access to either.
+    - Fortunately, you can specify a list of ports in the pod definition itself. It isn’t necessary to specify any ports, but it is a good idea to always do so.
+    - The pod manifest says that the container uses port 8080, so you now have everything you need to talk to the application.
+3. CONNECTING TO THE POD FROM THE WORKER NODES:
+    - The Kubernetes network model dictates that each pod is accessible from any other pod and that each node can reach any pod on any node in the cluster.
+    - Once you have logged into the node, use the curl command with the pod’s IP and port to access your application.
+    - `curl <IP>:8080`
+    - Normally you don’t use this method to talk to your pods, but you may need to use it if there
+are communication issues and you want to find the cause by first trying the shortest possible
+communication route.
+4. CONNECTING FROM A ONE-OFF CLIENT POD:
+    - The second way to test the connectivity of your application is to run curl in another pod that you create specifically for this task.
+    - Creating a pod just to see if it can access another pod is useful when you’re specifically testing pod-to-pod connectivity.
+    - `kubectl run --image=curlimages/curl -it --restart=Never --rm client-pod curl <IP>:8080`
+5. CONNECTING TO PODS VIA KUBECTL PORT FORWARDING:
+    - During development, the easiest way to talk to applications running in your pods is to use the `kubectl port-forward` command, which allows you to communicate with a specific pod through a proxy bound to a network port on your local computer.
+    - To open a communication path with a pod, you don’t even need to look up the pod’s IP, as you only need to specify its name and the port.
+    - `kubectl port-forward myapp 8080`
+    - The proxy now waits for incoming connections. Run the following curl command in another terminal: `curl localhost:8080`
+
+![proxy bound to a network port](./images/img08.png)
+<!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition -->
+
 
 
 
