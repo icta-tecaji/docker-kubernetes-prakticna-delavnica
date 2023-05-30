@@ -1,9 +1,5 @@
 # Container orchestration and microservices
 
-
-
-
-
 ## Traditional applications
 - In the past, most applications were large monoliths. The components of the application were **tightly coupled**, and they all **ran in a single computer process**.
 - The application was developed as a unit by a **large team of developers** and the deployment of the application was straightforward.
@@ -37,6 +33,9 @@ The popularity of Kubernetes has forced all major cloud providers to integrate K
 
 ## Moving from monolithic apps to microservices
 
+
+## 12 Factor Apps
+- https://12factor.net/
 
 ## Container Orchestration
 Container orchestration is the process of deploying containers on a compute cluster consisting of multiple nodes. Orchestration tools extend lifecycle management capabilities to complex, multi-container workloads deployed on a cluster of machines. By abstracting the host infrastructure, container orchestration tools allow the users deploying to entire cluster as a single deployment target.
