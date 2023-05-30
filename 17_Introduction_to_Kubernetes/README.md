@@ -335,5 +335,8 @@ Remove the resources:
 - `kubectl get pods`
 
 ## Connect to the cluster from the local computer
-- https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/
-- https://docs.k3s.io/cluster-access
+- [Install kubectl on Windows and Create Kubeconfig File](https://www.virtualizationhowto.com/2021/06/install-kubectl-on-windows-and-create-kubeconfig-file/)
+- [Cluster Access](https://docs.k3s.io/cluster-access)
+- [Install and Set Up kubectl on Windows](https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/)
+
+The kubeconfig file stored at `/etc/rancher/k3s/k3s.yaml` is used to configure access to the Kubernetes cluster. If you have installed upstream Kubernetes command line tools such as kubectl or helm you will need to configure them with the correct kubeconfig path. This can be done by either exporting the `KUBECONFIG` environment variable or by invoking the `--kubeconfig` command line flag. Refer to the examples below for details.
