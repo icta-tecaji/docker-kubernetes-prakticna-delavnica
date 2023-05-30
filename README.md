@@ -157,6 +157,9 @@
 - Running init containers
 - Deleting pods and other objects
 
+## Managing the lifecycle of the Pod
+
+
 ## Del 19: Replication controllers
 
 ## Del 20: Kubernetes Deployments

@@ -5,7 +5,8 @@
 - In the Docker world, the atomic unit is the **container**. This means deploying applications on Docker is done by scheduling them inside of containers.
 - In the Kubernetes world, the atomic unit is the **Pod**. Ergo, deploying applications on Kubernetes means stamping them out in Pods.
 
-A Pod is the **basic execution unit of a Kubernetes application–the smallest and simplest unit in the Kubernetes object model that you create or deploy**. - A Pod represents processes running on your Cluster.
+A Pod is the **basic execution unit of a Kubernetes application–the smallest and simplest unit in the Kubernetes object model that you create or deploy**. 
+- A Pod represents processes running on your Cluster.
 - Kubernetes wraps the container in the Pod.
 - A Pod is a unit of compute, which runs on a **single node** in the cluster.
 - A Pod is a shared execution environment for **one or more containers**.
@@ -93,7 +94,7 @@ changes** by storing these files in a VCS (Version Control System).
 
 ### Creating a YAML manifest for a pod
 Now create an object manifest from scratch.
-- `cd docker-k8s/18_Kubernetes_Pods/examples/`
+- `cd ~/docker-k8s/18_Kubernetes_Pods/examples/`
 - `cat 01_example.yaml`
 
 After you’ve prepared the manifest file for your pod, you can now create the object by posting the file to the Kubernetes API.
@@ -134,9 +135,7 @@ You’ve learned that each pod is assigned its own IP address where it can be ac
     - The Kubernetes network model dictates that each pod is accessible from any other pod and that each node can reach any pod on any node in the cluster.
     - Once you have logged into the node, use the curl command with the pod’s IP and port to access your application.
     - `curl <IP>:8080`
-    - Normally you don’t use this method to talk to your pods, but you may need to use it if there
-are communication issues and you want to find the cause by first trying the shortest possible
-communication route.
+    - Normally you don’t use this method to talk to your pods, but you may need to use it if there are communication issues and you want to find the cause by first trying the shortest possible communication route.
 4. CONNECTING FROM A ONE-OFF CLIENT POD:
     - The second way to test the connectivity of your application is to run curl in another pod that you create specifically for this task.
     - Creating a pod just to see if it can access another pod is useful when you’re specifically testing pod-to-pod connectivity.
@@ -167,13 +166,10 @@ Press ctrl-C to stop streaming the log when you’re done.
 You may have noticed that we forgot to include the timestamp in the log statement. Logs without timestamps have limited usability. Fortunately, the container runtime attaches the current timestamp to every line produced by the application. You can display these timestamps by using the `--timestamps=true` option, as shown in the next listing.
 - `kubectl logs myapp --timestamps`
 
-Kubernetes keeps a separate log file for each container. They are usually stored in
-`/var/log/containers` on the node that runs the container. If the container is restarted, its logs are written to a new file. When you delete a pod, all its log files are also deleted. To make pods’ **logs available permanently, you need to set up a central, cluster-wide logging system.**
+Kubernetes keeps a separate log file for each container. They are usually stored in `/var/log/containers` on the node that runs the container. If the container is restarted, its logs are written to a new file. When you delete a pod, all its log files are also deleted. To make pods’ **logs available permanently, you need to set up a central, cluster-wide logging system.**
 
 ## Copying files to and from containers
-Sometimes you may want to add a file to a running container or retrieve a file from it.
-Modifying files in running containers isn’t something you normally do - at least not in
-production - but it can be useful during development.
+Sometimes you may want to add a file to a running container or retrieve a file from it. Modifying files in running containers isn’t something you normally do - at least not in production - but it can be useful during development.
 
 For example, to copy the `/etc/hosts` file from the container of the pod to the `/tmp` directory on your local file system, run the following command:
 - `kubectl cp myapp:/etc/hosts /tmp/myapp-hosts`
@@ -280,9 +276,7 @@ Build the images:
 - `docker push leon11sj/network-checker:1.0`
 - `cd ..`
 
-Before you create the pod from the manifest file, run the following command in a separate
-terminal so you can see how the pod’s status changes as the init and regular containers
-start:
+Before you create the pod from the manifest file, run the following command in a separate terminal so you can see how the pod’s status changes as the init and regular containers start:
 - `kubectl get pods -w`
 - `kubectl get events -w`
 - `kubectl apply -f 03_example_init.yaml`
