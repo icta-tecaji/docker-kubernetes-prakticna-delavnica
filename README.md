@@ -157,9 +157,6 @@
 - Running init containers
 - Deleting pods and other objects
 
-
-- self-healing apps
-
 ## Del 19: Replication controllers
 
 ## Del 20: Kubernetes Deployments
