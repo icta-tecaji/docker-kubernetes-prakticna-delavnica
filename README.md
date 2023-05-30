@@ -157,12 +157,15 @@
 - Running init containers
 - Deleting pods and other objects
 
-## Managing the lifecycle of the Pod
+## [Del 19: Managing the lifecycle of the Pod](./19_Managing_the_lifecycle_of_the_Pod/README.md)
+- Understanding the pod's status
+- Understanding pod conditions
+- Understanding the status of the containers
+- Keeping containers healthy
 
+## Del 20: Replication controllers
 
-## Del 19: Replication controllers
-
-## Del 20: Kubernetes Deployments
+## Del 21: Kubernetes Deployments
 - Performing a rolling update
 - Managing app releases with rollouts and rollbacks
 
@@ -205,10 +208,9 @@
 
 
 
-
-
-
-
-
 ## Kubernetes
 - https://kubernetes.io/docs/tasks/administer-cluster/migrating-from-dockershim/check-if-dockershim-removal-affects-you/
+
+
+## Presequites
+- `sudo apt  install jq`
