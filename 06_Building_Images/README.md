@@ -114,6 +114,8 @@ Docker enforces that by making **image layers read-only**. Once you create a lay
 
 There’s a layer of your web-ping image that contains the application’s JavaScript file. If you **make a change to that file and rebuild your image, you’ll get a new image layer**.
 
+> BuildKit is the default builder for users on Docker Desktop, and Docker Engine as of version 23.0.
+
 Docker assumes the layers in a Docker image follow a defined sequence, so if you change a layer in the middle of that sequence, Docker doesn’t assume it can reuse the later layers in the sequence.
 
 Make a change to the `app.js` file. It doesn’t have to be a code change; just adding a new empty line at the end of the file will do.
@@ -374,3 +376,15 @@ To show how this works, let’s adapt the Dockerfile from the previous section t
 ## Build images with BuildKit (Advanced)
 
 [More here](./Build_images_with_BuildKit_Advanced.md).
+
+## Building and Testing Multi-Arch Images (Advanced)
+
+[More here](./Building_and_Testing_Multi-Arch_Images_Advanced.md).
+
+## Building Wasm Images (Advanced)
+
+[More here](./Building_Wasm_Images_Advanced.md).
+
+## Generate the SBOM for Docker images (Advanced)
+
+[More here](./Generate_the_SBOM_for_Docker_images_Advanced.md).

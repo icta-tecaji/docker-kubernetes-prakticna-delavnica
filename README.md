@@ -74,6 +74,9 @@
 - More best practices for writing Dockerfiles (Advanced) 
 - Building Docker images from a container (Advanced)
 - Build images with BuildKit (Advanced)
+- Building and Testing Multi-Arch Images (Advanced)
+- Building Wasm Images (Advanced)
+- Generate the SBOM for Docker images (Advanced)
 
 ## [Del 7: Sharing Docker Images](./07_Sharing_Docker_Images/README.md)
 - Working with registries, repositories, and image tags
@@ -92,6 +95,7 @@
 - Development with Compose
 - Production deployment with Compose: counter-app
 - Scaling and Load Balancing using Compose
+- Advanced Compose features (Advanced)
 
 ## [Del 9: Docker Reliability And Health Checks](./09_Docker_Reliability_And_Health_Checks/README.md)
 - Self-healing containers with restart policies
@@ -218,4 +222,4 @@
 
 
 ## Presequites
-- `sudo apt  install jq`
+- `sudo apt install jq`

@@ -1,0 +1,4 @@
+# Building Wasm Images (Advanced)
+
+- https://www.docker.com/blog/docker-wasm-technical-preview/
+- https://www.docker.com/blog/build-share-run-webassembly-apps-docker/

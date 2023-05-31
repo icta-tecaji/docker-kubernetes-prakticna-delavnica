@@ -177,3 +177,6 @@ Few more steps:
 - Scale down: `docker compose -f docker-compose.prod.yml up -d --scale web-fe=1`
 - `docker compose -f docker-compose.prod.yml ps`
 - Stop the app: `docker compose -f docker-compose.prod.yml down -v`
+
+## Advanced Compose features (Advanced)
+More [here](./Advanced_Compose_features.md).
