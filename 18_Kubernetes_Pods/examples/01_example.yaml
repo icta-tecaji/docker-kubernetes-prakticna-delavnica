@@ -1,0 +1,17 @@
+# This manifest uses the v1 API version to define the object
+apiVersion: v1
+# The object specified in this manifest is a pod
+kind: Pod
+metadata:
+  # The name of the pod
+  name: myapp
+spec:
+  containers:
+    # The name of the container
+  - name: myapp
+    # Container image to create the container from
+    image: leon11sj/test-app
+    ports:
+    # The port the app is listening on
+    - containerPort: 8080
+

@@ -150,7 +150,7 @@ The Kubernetes project maintains release branches for the most recent three mino
 
 It is always recommended to upgrade the Kubernetes cluster to the latest available stable version. There are several techniques such as rolling updates, and node pool migrations that allow you to complete an update with minimal disruption and downtime.
 
-![Support windows](./images/img11.png)
+![Support windows](https://upload.wikimedia.org/wikipedia/en/timeline/ss2e7boz2yrsj4ipyu6e9m44zv1fuo2.png)
 <!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-1/v-14/17 -->
 
 
@@ -211,7 +211,7 @@ The top managed Kubernetes offerings include the following:
 
 ### K3s installation
 K3s provides an installation script that is a convenient way to install it as a service on systemd or openrc based systems. To install K3s using this method, just run:
-- `curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" sh -s - --disable=traefik`
+- `curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" sh -`
 - Check the version: `k3s --version`
 - Run the following command to check that your cluster is up and running: `kubectl get nodes -o wide`
     - It’s a list of all the nodes in your cluster, with some basic details like the status and Kubernetes version.
@@ -333,3 +333,10 @@ Remove the resources:
 - `kubectl delete svc test`
 - `kubectl delete deploy test`
 - `kubectl get pods`
+
+## Connect to the cluster from the local computer
+- [Install kubectl on Windows and Create Kubeconfig File](https://www.virtualizationhowto.com/2021/06/install-kubectl-on-windows-and-create-kubeconfig-file/)
+- [Cluster Access](https://docs.k3s.io/cluster-access)
+- [Install and Set Up kubectl on Windows](https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/)
+
+The kubeconfig file stored at `/etc/rancher/k3s/k3s.yaml` is used to configure access to the Kubernetes cluster. If you have installed upstream Kubernetes command line tools such as kubectl or helm you will need to configure them with the correct kubeconfig path. This can be done by either exporting the `KUBECONFIG` environment variable or by invoking the `--kubeconfig` command line flag. Refer to the examples below for details.

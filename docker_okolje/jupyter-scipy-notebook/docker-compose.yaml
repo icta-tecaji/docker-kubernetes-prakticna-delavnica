@@ -1,8 +1,0 @@
-version:  '3'
-services:
-  jupyter-scipy-notebook-public:
-      image: jupyter/scipy-notebook
-      volumes:
-        - ~/docker-k8s:/home/jovyan/work
-      ports:
-        - 8888:8888
