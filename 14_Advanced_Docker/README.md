@@ -18,3 +18,8 @@ The specific features are as follows:
 - cgroups—Resource protection
 - CAP drop—Operating system feature restrictions
 - Security modules—Mandatory access controls
+
+
+Docker init:
+- Docker Init,https://www.docker.com/blog/docker-init-initialize-dockerfiles-and-compose-files-with-a-single-cli-command/
+- https://docs.docker.com/engine/reference/commandline/init/

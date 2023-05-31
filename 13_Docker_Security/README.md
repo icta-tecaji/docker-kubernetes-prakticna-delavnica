@@ -38,3 +38,4 @@ Each new layer has the risk of introducing new vulnerabilities into the containe
 
 - https://docs.docker.com/get-started/09_image_best/#security-scanning
 - https://www.docker.com/blog/what-is-the-best-container-security-workflow/
+- https://www.docker.com/blog/developer-workstation-security-best-practices/
