@@ -171,6 +171,9 @@
 - Understanding pod conditions
 - Understanding the status of the containers
 - Keeping containers healthy
+- Liveness probes
+- Startup probes
+- Lifecycle hooks
 
 ## Del 20: Replication controllers
 

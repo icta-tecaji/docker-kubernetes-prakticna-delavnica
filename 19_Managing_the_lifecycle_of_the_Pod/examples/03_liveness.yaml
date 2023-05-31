@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-liveness
+spec:
+  containers:
+  - name: myapp
+    image: leon11sj/test-app
+    ports:
+    - name: http
+      containerPort: 8080
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 8080
+  - name: envoy
+    image: leon11sj/myapp-ssl-proxy:1.2
+    imagePullPolicy: Always
+    ports:
+    - name: https
+      containerPort: 8443
+    - name: admin
+      containerPort: 9901
+    livenessProbe:
+      httpGet:
+        path: /ready
+        port: admin
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 2
+      failureThreshold: 3
