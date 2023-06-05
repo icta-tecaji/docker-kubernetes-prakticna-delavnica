@@ -126,8 +126,10 @@
 - https://docs.docker.com/security/
 
 ## [Del 14: Advanced Docker](./14_Advanced_Docker/README.md)
+- Podman
+- Run the Docker daemon as a non-root user - Rootless mode (Advanced)
 - Controlling HTTP traffic to containers with a reverse proxy
-- Multi-architecture images (NP - 67)
+
 - Asynchronous communication with a message queue
 - https://medium.com/@saschagrunert/demystifying-containers-part-i-kernel-space-2c53d6979504
 
@@ -181,7 +183,13 @@
 - Performing a rolling update
 - Managing app releases with rollouts and rollbacks
 
-## Del 22: Services, Load Balancing, and Networking
+## [Del 22: Services, Load Balancing, and Networking](./22_Services_Load_Balancing_and_Networking/README.md)
+- Understanding how pods communicate
+- Introducing services
+- Accessing Services from outside the cluster with NodePort Service
+- Accessing Services from outside the cluster with LoadBalancer Service
+- Ingress
+- Service Mesh (Advanced)
 
 ## Del 23: Storing data in Kubernetes
 - Volumes
