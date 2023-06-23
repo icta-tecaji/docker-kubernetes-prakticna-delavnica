@@ -224,8 +224,8 @@
 - [Collabnix](https://collabnix.com/)
 - [Articles: Production-ready Docker packaging for Python developers](https://pythonspeed.com/docker/)
 - [Awesome Docker](https://github.com/veggiemonk/awesome-docker)
-
-
+- [Learning Containers, Kubernetes, and Backend Development with Ivan Velichko](https://iximiuz.com/en/)
+- https://iximiuz.com/en/posts/learn-by-doing-platforms/
 
 
 ## Kubernetes

@@ -1,0 +1,2 @@
+- https://eng.lyft.com/improving-kubernetes-cronjobs-at-scale-part-1-cf1479df98d4
+- https://eng.lyft.com/how-we-learned-to-improve-kubernetes-cronjobs-at-scale-part-2-of-2-dad0c973ffca
