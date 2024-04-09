@@ -209,13 +209,19 @@
 
 ## Del 28: Packaging and managing apps with Helm
 
-## Del 29: Kubernetes security
+## Del 29: Deploying application on a cluster
+
+## Del 30: Kubernetes security
 - Securing applications with policies, contexts, and admission control
 
-## Del 30: Advanced Kubernetes
+## Del 31: Advanced Kubernetes
 - running private images
 
-## Del 31: Developer workflows and CI/CD
+
+
+- https://realpython.com/build-a-python-url-shortener-with-fastapi/
+
+
 
 ## Gradiva
 - [Docker Official Samples](https://docs.docker.com/samples/#tutorial-labs)

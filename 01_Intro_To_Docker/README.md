@@ -14,7 +14,7 @@ for operators and developers across the industry—in the 2019 Stack Overflow su
 
 ## Why are containers and Docker so important?
 - **Migrating apps to the cloud**
-    - Moving apps to the cloud is top of mind for many organizations. -> Manj stroškov, lažje skaliranje, hitrejšideploy novih aplikaciji, ni skrbi z opremo.
+    - Moving apps to the cloud is top of mind for many organizations. -> Less cost, easier scaling, faster deployment of new applications, no worries about hardware.
     - You migrate each part of your application to a container, and then you can run the whole application in containers using Kubernetes or other cloud services, or on your own Docker cluster in the datacenter.
         - It does take some investment to migrate to containers (Dockerfiles, manifests using the Docker Compose or Kubernetes format.).
     
@@ -47,33 +47,54 @@ for operators and developers across the industry—in the 2019 Stack Overflow su
 
 ## Installing Docker
 
+Docker is a set of platform as a service (PaaS) products that use OS-level virtualization to deliver software in packages called containers.
+
+![Docker Products](./images/img06.png)
+<!-- Vir: https://docs.docker.com/ -->
+
+### About Docker Company
+Docker is software that runs on Linux and Windows. It creates, manages, and can even orchestrate containers. The software is currently built from various tools **from the Moby open-source project**. Docker, Inc. is the company that created the technology and continues to create technologies and solutions.
+
+Docker, Inc. is a San Francisco based technology company founded by French-born American developer and entrepreneur Solomon Hykes.
+
+It’s also interesting to know that the word “Docker” comes from a British expression meaning dock worker — somebody who loads and unloads cargo from ships.
+
 ### Docker Desktop
-Docker Desktop is an easy-to-install application for your Mac or Windows environment that enables you to build and share containerized applications and microservices.
+Docker Desktop is a one-click-install application for your Mac, Linux, or Windows (using Hyper-V or WSL2) environment that lets you build, share, and run containerized applications and microservices.
+
+It provides a straightforward **GUI (Graphical User Interface)** that lets you manage your containers, applications, and images directly from your machine.
+
+Docker Desktop reduces the time spent on complex setups so you can focus on writing code. It takes care of port mappings, file system concerns, and other default settings, and is regularly updated with bug fixes and security updates.
 
 Docker Desktop includes:
 - Docker Engine
 - Docker CLI client
-- Docker Compose 
+- Docker Scout (additional subscription may apply)
+- Docker Build
+- Docker Extensions
+- Docker Compose
 - Docker Content Trust
 - Kubernetes
-- Credential Helper.
+- Credential Helper
 
-Docker Desktop works with your choice of development tools and languages and gives you access to a vast library of certified images and templates in Docker Hub. This enables development teams to extend their environment to rapidly auto-build, continuously integrate, and collaborate using a secure repository.
+Docker Desktop works with your choice of development tools and languages and gives you access to a vast library of certified images and templates in Docker Hub. This allows development teams to extend their environment to rapidly auto-build, continuously integrate, and collaborate using a secure repository.
 
-> **Update to the Docker Desktop terms**: Commercial use of Docker Desktop in larger enterprises (more than 250 employees OR more than $10 million USD in annual revenue) now requires a paid subscription.
+> **Update to the Docker Desktop terms**: Commercial use of Docker Desktop at a company of more than 250 employees OR more than $10 million in annual revenue requires a paid subscription (Pro, Team, or Business).
 
 Install Docker Desktop: https://docs.docker.com/get-docker/
 
 ### Docker Engine
-Docker Engine is an open source containerization technology for building and containerizing your applications. Docker Engine acts as a client-server application with:
-- A server with a long-running daemon process dockerd.
-- APIs which specify interfaces that programs can use to talk to and instruct the Docker daemon.
-- A command line interface (CLI) client docker.
+Docker Engine is an open source (licensed under the Apache License, Version 2.0) containerization technology for building and containerizing your applications. Docker Engine acts as a client-server application with:
+- A server with a long-running daemon process **dockerd**.
+- APIs which specify interfaces that programs can use to talk to and instruct the **Docker daemon**.
+- A command line interface (CLI) **client docker**.
 
 1. [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
 2. [Post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/)
-    - [Optional] Manage Docker as a non-root user -> Security risks!
-    - Configure Docker to start on boot
+    - [Optional] Manage Docker as a non-root user -> Security risks! 
+    - Configure Docker to start on boot with systemd
+
+> Run the Docker daemon as a non-root user (**[Rootless mode](https://docs.docker.com/engine/security/rootless/)**): Rootless mode allows running the Docker daemon and containers as a non-root user to mitigate potential vulnerabilities in the daemon and the container runtime.
 
 ### Differences between Docker Desktop for Linux and Docker Engine
 
@@ -81,7 +102,7 @@ Docker Engine is an open source containerization technology for building and con
 
 ### Verifying your Docker setup
 First check Docker itself with the docker version command:
-- `docker version`
+- `sudo docker version`
 
 ## Running Hello World in a container
 You’re going to send a command to Docker, telling it to run a container that
@@ -99,7 +120,7 @@ Enter this command, which will run the Hello World container: `sudo docker conta
 
 Run and check for a container:
 - List all running container processes: `sudo docker ps`
-- `sudo docker ps -a`
+- `sudo docker ps -a` (List all containers, running and stopped)
 
 Docker needs to have a copy of the image locally before it can run a container
 using the image. The very first time you run this command, you won’t have a copy of the image, and you can see that in the first output line: `unable to find image locally`. Then Docker downloads the image (which Docker calls “pulling”), and you can see that the image has been downloaded.
@@ -115,12 +136,11 @@ Docker already has a copy of the image locally so it doesn’t need to download 
 When you use docker run the second time, it creates a second container from the same repository. This means that if you repeatedly use docker run and create a bunch of containers, you’ll need to get a list of the containers you’ve created and maybe at some point destroy them.
 
 Run and check for a container:
-- `sudo docker ps`
 - `sudo docker ps -a`
 
 Understand that the running state of a container is directly tied to the state of a single running program inside the container. **If a program is running, the container is running. If the program is stopped, the container is stopped.** Restarting a container will run the program again.
 
-Clean: `sudo docker container rm -f $(docker container ls -aq)`
+Clean: `sudo docker container rm -f $(sudo docker container ls -aq)`
 
 ## Example: Running multiple NGINX instances
 1. Preverimo ali je na virtualki že zagnan Apache server:
@@ -165,12 +185,7 @@ Clean: `sudo docker container rm -f $(docker container ls -aq)`
     - Preverimo ali je up: `sudo docker ps`
 6. Clean: `sudo docker container rm -f $(docker container ls -aq)`
 
-## About Docker Company
-Docker is software that runs on Linux and Windows. It creates, manages, and can even orestrate containers. The software is currently built from various tools **from the Moby open-source project**. Docker, Inc. is the company that created the technology and continues to create technologies and solutions.
 
-Docker, Inc. is a San Francisco based technology company founded by French-born American developer and entrepreneur Solomon Hykes.
-
-It’s also interesting to know that the word “Docker” comes from a British expression meaning dock worker — somebody who loads and unloads cargo from ships.
 
 ## Docker Architecture
 Docker is **written in the Go programming language** and takes advantage of several features of the Linux kernel to deliver its functionality. Docker uses a technology called **namespaces** to provide the isolated workspace called the container. When you run a container, Docker creates a set of namespaces for that container.
