@@ -231,6 +231,3 @@
 ## Kubernetes
 - https://kubernetes.io/docs/tasks/administer-cluster/migrating-from-dockershim/check-if-dockershim-removal-affects-you/
 
-
-## Presequites
-- `sudo apt install jq`
