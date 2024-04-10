@@ -143,31 +143,28 @@ Understand that the running state of a container is directly tied to the state o
 Clean: `sudo docker container rm -f $(sudo docker container ls -aq)`
 
 ## Example: Running multiple NGINX instances
-1. Preverimo ali je na virtualki že zagnan Apache server:
+1. Preverimo ali je na virtualki že zagnan kakšen drugi server:
     - Preverimo delovanje: `curl http://127.0.0.1 ali IP virtualke`
-    - `sudo systemctl stop apache2.service`
-    - `sudo systemctl disable apache2.service`
 2. Želimo namesti in stestirati delovanje NGINX instance:
-    - `sudo apt-get update`
-    - `sudo apt-get install -y nginx`
+    - `sudo apt update`
+    - `sudo apt install -y nginx`
     - `nginx -v`
     - `sudo systemctl start nginx`
     - `sudo systemctl status nginx`
     - Preverimo delovanje: `curl http://127.0.0.1 ali IP virtualke`
 3. Želimo namestiti dve instance NGINX:
-    - `sudo apt-get install nginx` - > že obstaja
+    - `sudo apt install nginx` - > že obstaja
     - `sudo systemctl start nginx` -> vidmo da še vedno samo ena instanca je delujoča
     - `sudo ps aux | grep nginx`
-    - Če želimo namestit dve instance moramo spremeniti init scripte
-        - `cat /etc/init/nginx.conf`
-    -    To je komplicirani delo, pa še skoraj nemogoče za dve različne verzije
+    - Če želimo namestit dve instance moramo spremeniti init scripte. To je komplicirani delo, pa še skoraj nemogoče za dve različne verzije.
     - Ustavimo:
         - `sudo systemctl stop nginx`
         - `sudo systemctl disable nginx`
+        - `sudo apt remove nginx`
     - Problem da ko namestimo mi eno verzijo spodaj imamo odvisnosti ki so različne od verzije. To nam kontejnerji poenostavijo.
 4.  Zaženmo NGINX s pomočjo Dockrja:
     - NGINX DockerHub: https://hub.docker.com/_/nginx
-    - Prenesemo image lokalno (ta korak ni nujen, če slike ni se zgodi avtomatsko ob zagonu): `docker pull nginx`
+    - Prenesemo image lokalno (ta korak ni nujen, če slike ni se zgodi avtomatsko ob zagonu): `sudo docker pull nginx`
         - Uporaba default taga `latest`
         - Zagon 1. instance: `sudo docker run -d nginx`
         - Preverimo ali je up: `sudo docker ps`
@@ -183,9 +180,8 @@ Clean: `sudo docker container rm -f $(sudo docker container ls -aq)`
 5. Izpostavimo kontejner na internet:
     - `sudo docker run -d -p "80:80" nginx`
     - Preverimo ali je up: `sudo docker ps`
-6. Clean: `sudo docker container rm -f $(docker container ls -aq)`
-
-
+    - Preverimo delovanje: `curl http://127.0.0.1 ali IP virtualke`
+6. Clean: `sudo docker container rm -f $(sudo docker container ls -aq)`
 
 ## Docker Architecture
 Docker is **written in the Go programming language** and takes advantage of several features of the Linux kernel to deliver its functionality. Docker uses a technology called **namespaces** to provide the isolated workspace called the container. When you run a container, Docker creates a set of namespaces for that container.
@@ -202,12 +198,12 @@ In a default Linux installation, the client talks to the daemon via a local IPC/
 
 Another Docker client is Docker Compose, that lets you work with applications consisting of a set of containers.
 
-![Docker Architecture](./images/img02.svg)
+![Docker Architecture](./images/img07.webp)
 <!-- Vir: https://docs.docker.com/get-started/overview/ -->
 
-A Docker registry stores Docker images. Docker Hub is a public registry that anyone can use, and Docker is configured to look for images on Docker Hub by default. You can even run your own private registry.
+A Docker registry stores Docker images. Docker Hub is a public registry that anyone can use, and Docker looks for images on Docker Hub by default. You can even run your own private registry.
 
-When you use the `docker pull` or `docker run` commands, the required images are pulled from your configured registry. When you use the `docker push` command, your image is pushed to your configured registry.
+When you use the `docker pull` or `docker run` commands, Docker pulls the required images from your configured registry. When you use the `docker push` command, Docker pushes your image to your configured registry.
 
 ![Docker Architecture2](./images/img03.png)
 <!-- Vir: Docker Deep Dive, Nigel Poulton -->
@@ -216,7 +212,7 @@ When you use the `docker pull` or `docker run` commands, the required images are
     - The **low-level runtime** is called `runc` and is the reference implementation of Open Containers Initiative (OCI) runtime-spec. Its job is to interface with the underlying OS and start and stop containers. Every running container on a Docker node has a runc instance managing it.
     - The **higher-level runtime** is called `containerd`. containerd does a lot more than runc. It manages the entire lifecycle of a container, including pulling images, creating network interfaces, and managing lower-level runc instances. containerd is pronounced “container-dee’ and is a graduated CNCF project used by Docker and Kubernetes as a container runtime. A typical Docker installation has a single containerd process (docker-containerd) controlling the runc (dockerrunc) instances associated with each running container.
 - The **Docker daemon** (`dockerd`) sits above containerd and performs higher-level tasks such as; exposing the Docker remote API, managing images, managing volumes, managing networks, and more… A major job of the Docker daemon is to provide an easy-to-use standard interface that abstracts the lower levels.
-- Docker also has native support for managing clusters of nodes running Docker. These clusters are called swarms and the native technology is called Docker Swarm. Docker Swarm is easy-to-use and many companies are using it in real-world production. However, most people are choosing to use Kubernetes instead of Docker Swarm.
+- Docker also has native support for managing clusters of nodes running Docker. These clusters are called swarms and the native technology is called **Docker Swarm**. Docker Swarm is easy-to-use and many companies are using it in real-world production. However, most people are choosing to use Kubernetes instead of Docker Swarm.
 
 ## The Docker Engine (Advanced)
 

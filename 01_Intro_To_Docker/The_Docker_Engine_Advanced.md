@@ -14,7 +14,7 @@ A high-level view of the current Docker engine architecture with brief descripti
 ![Docker Architecture4](./images/img05.png)
 <!-- Vir: Docker Deep Dive, Nigel Poulton -->
 
-As of Docker 1.11 (early 2016), the Docker engine implements the OCI specifications as closely as possible. For example, the Docker daemon no longer contains any container runtime code — all container runtime code is implemented in a separate OCI-compliant layer. By default, Docker uses runc for this. runc is the reference implementation of the OCI container-runtime-spec.
+As of Docker 1.11 (early 2016), the Docker engine implements the **OCI specifications** as closely as possible. For example, the Docker daemon no longer contains any container runtime code — all container runtime code is implemented in a separate OCI-compliant layer. By default, Docker uses runc for this. runc is the reference implementation of the OCI container-runtime-spec.
 
 As well as this, the containerd component of the Docker Engine makes sure Docker images are presented to runc as valid OCI bundles.
 
