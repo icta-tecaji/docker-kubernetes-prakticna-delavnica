@@ -10,9 +10,7 @@ If you have an application’s Docker image, the only other thing you need to ru
 
 > You can think of Docker images as similar to VM templates. A VM template is like a stopped VM — a Docker image is like a stopped container.
 
-You get Docker images by **pulling them from an image registry**. The most common registry is Docker Hub, but
-others exist. The `pull` operation downloads the image to your local Docker host where Docker can use it to start
-one or more containers.
+You get Docker images by **pulling them from an image registry**. The most common registry is Docker Hub, but others exist. The `pull` operation downloads the image to your local Docker host where Docker can use it to start one or more containers.
 
 Images are **made up of multiple layers** that are stacked on top of each other and represented as a single object. Inside of the image is a cut-down operating system (OS) and all of the files and dependencies required to run an application. Because containers are intended to be fast and lightweight, **images tend to be small**.
 
@@ -52,13 +50,11 @@ The process of **getting images onto a Docker host is called pulling**. So, if y
 As you can see, the images just pulled are now present in the Docker host’s local repository.
 
 ## Image registries
-We **store images in centralised places called image registries**. This makes it easy to share and access them.
+We **store images in centralized places called image registries**. This makes it easy to share and access them.
 
-The most common registry is [Docker Hub](https://hub.doer.com). Other registries exist, including 3rd party registries and secure on-premises registries. However, the Docker client is opinionated and defaults to using Docker Hub. 
+The most common registry is [Docker Hub](https://hub.docker.com). Other registries exist, including 3rd party registries and secure on-premises registries. However, the Docker client is opinionated and defaults to using Docker Hub. 
 
-Run: `sudo docker info`
-
-Docker is configured to use `https://index.docker.io/v1/` as its default registry when pushing and pulling images (this actually redirects to v2).
+Docker is configured to use `https://index.docker.io/v2/` as its default registry when pushing and pulling images.
 
 **Image registries** contain one or more **image repositories.** In turn, image repositories contain one or more **images**.
 
@@ -72,9 +68,7 @@ As the name suggests, **official repositories** are the home to images that have
 
 **Unofficial repositories** can be like the wild-west — you should not assume they are safe, well-documented or built according to best practices. That’s not saying everything in unofficial repositories is bad. There’s some excellent stuff in unofficial repositories. You just need to be **very careful before trusting code from them**. To be honest, you should always be careful when trusting software from the internet — even images from official repositories.
 
-Most of the popular applications and base operating systems have their own official repositories on Docker Hub.
-They’re easy to spot because they live at the top level of the Docker Hub namespace. The following list contains
-a few of the official repositories, and shows their URLs that exist at the top-level of the Docker Hub namespace:    
+Most of the popular applications and base operating systems have their own official repositories on Docker Hub. They’re easy to spot because they live at the top level of the Docker Hub namespace. The following list contains a few of the official repositories, and shows their URLs that exist at the top-level of the Docker Hub namespace:    
 - nginx: https://hub.docker.com/_/nginx/
 - busybox: https://hub.docker.com/_/busybox/
 - redis: https://hub.docker.com/_/redis/
@@ -103,7 +97,7 @@ google-containers/git-sync repo on the Google Container Registry (gcr.io).
 
 Notice how the pull experience is exactly the same from Docker Hub and the Google Container Registry.
 
-A **single image can have as many tags as you want**. This is because tags are arbitrary alpha-numeric values that are stored as metadata alongside the image ([example](https://hub.docker.com/_/python)). `latest` is an arbitrary tag and is not guaranteed to point to the newest image in a repository.
+A **single image can have as many tags as you want**. This is because tags are arbitrary alpha-numeric values that are stored as metadata alongside the image ([example](https://hub.docker.com/_/python)). Once again, the `latest` is an arbitrary tag and is not guaranteed to point to the newest image in a repository.
 
 ## Filtering the images on the host
 
@@ -112,7 +106,7 @@ Docker provides the `--filter` flag to filter the list of images returned by doc
 
 A **dangling image is an image that is no longer tagged**, and appears in listings as `<none>:<none>`. A common way they occur is when building a new image giving it a tag that already exists. When this happens, Docker will build the new image, notice that an existing image already has the same tag, remove the tag from the existing image and give it to the new image.
 
-You can **delete all dangling images** on a system with the `docker image prune` command. If you add the `-a` flag, Docker will also remove all unused images (those not in use by any containers).
+You can **delete all dangling images** on a system with the `sudo docker image prune` command. If you add the `-a` flag, Docker will also remove all unused images (those not in use by any containers).
 
 Docker currently supports the following filters:
 - `dangling`: Accepts true or false, and returns only dangling images (true), or non-dangling images (false).
@@ -132,7 +126,7 @@ Docker takes care of stacking these layers and representing them as a single uni
 There are a few ways to see and inspect the layers that make up an image. In fact, we saw one earlier when pulling images. The following example looks closer at an image pull operation.
 - `sudo docker image pull redis:latest`
 
-Each line in the output above that ends with “Pull complete” represents a layer in the image that was pulled. As we can see, this image has 6 layers.
+Each line in the output above that ends with “Pull complete” represents a layer in the image that was pulled. As we can see, this image has 8 layers.
 
 Another way to see the layers of an image is to inspect the image with the docker image inspect command.
 - `sudo docker image inspect redis:latest`
@@ -140,33 +134,41 @@ Another way to see the layers of an image is to inspect the image with the docke
 The `docker image inspect` command is a great way to see the details of an image.
 
 The `docker history` command is another way of inspecting an image and seeing layer data. However, it **shows the build history of an image** and is not a strict list of layers in the final image. For example, some Dockerfile instructions (“ENV”, “EXPOSE”, “CMD”, and “ENTRYPOINT”) add metadata to the image and do not result in permanent layers being created.
+- `sudo docker history redis:latest`
 
 **All Docker images start with a base layer**, and as changes are made and new content is added, new layers are added on top.
 
-> Show an example of building a simple Python application (Ubuntu20, Python, source code).
+> An [example](https://hub.docker.com/layers/library/python/3.9.19-bookworm/images/sha256-c39e7db7ea07b57e384f4a70c08377a1af4404ec5dff514a973d9042714874bd?context=explore) of building a Python image..
 
-Docker employs a **storage driver** that is responsible for stacking layers and presenting them as a single unified filesystem/image. Examples of storage drivers on Linux include `AUFS`, `overlay2`, `devicemapper`, `btrfs` and `zfs`.
+Docker uses **storage drivers** to store image layers, and to store data in the writable layer of a container. Examples of storage drivers on Linux include `overlay2`, `fuse-overlayfs`, `btrfs`, `zfs`, and `vfs`.
 
 As their names suggest, each one is based on a Linux filesystem or block-device technology, and each has its own unique performance characteristics. No matter which storage driver is used, the user experience is the same.
 
 > Deeper dive: [About storage drivers](https://docs.docker.com/storage/storagedriver/), [Docker storage drivers](https://docs.docker.com/storage/storagedriver/select-storage-driver/)
 
-The layers are stacked on top of each other. When you create a new container, you add a new writable layer on top of the underlying layers. This layer is often called the “container layer”. All changes made to the running container, such as writing new files, modifying existing files, and deleting files, are written to this thin writable container layer. The diagram below shows a container based on an ubuntu:15.04 image.
+The layers are stacked on top of each other. When you create a new container, you add a new writable layer on top of the underlying layers. This layer is often called the **container layer**. All changes made to the running container, such as writing new files, modifying existing files, and deleting files, are written to this thin writable container layer. The diagram below shows a container based on an ubuntu:15.04 image.
 
-![cointainer layer](./images/img04.jpg)
+![container layer](./images/img04.jpg)
 <!-- Vir: https://docs.docker.com/storage/storagedriver/ -->
 
-When the container is deleted, the writable layer is also deleted. The underlying image remains unchanged.
+The **container's writable layer doesn't persist after the container is deleted**, but is suitable for storing ephemeral data that is generated at runtime. So when the container is deleted, the writable layer is also deleted, but the underlying image remains unchanged.
 
-A storage driver handles the details about the way these layers interact with each other. Different storage drivers are available, which have advantages and disadvantages in different situations.
+> Storage drivers are optimized for space efficiency, but (depending on the storage driver) write speeds are lower than native file system performance, especially for storage drivers that use a copy-on-write filesystem. Write-intensive applications, such as database storage, are impacted by a performance overhead, particularly if pre-existing data exists in the read-only layer. Use Docker volumes for write-intensive data.
+
+The major difference between a container and an image is the top writable layer. Because each container has its own writable container layer, and all changes are stored in this container layer, multiple containers can share access to the same underlying image and yet have their own data state. The diagram below shows multiple containers sharing the same Ubuntu 15.04 image.
+
+![container layer - multi](./images/sharing-layers.webp)
+<!-- Vir: https://docs.docker.com/storage/storagedriver/ -->
+
 
 ### Sharing image layers
 
 Multiple images can, and do, share layers. This leads to efficiencies in space and performance.
 
 Let’s take a second look at the docker image pull command:
-- `sudo docker image pull python:3.9.13-bullseye`
-- `sudo docker image pull python:3.9.13-slim-bullseye`
+- `sudo docker image prune -a`
+- `sudo docker image pull python:3.12.3-slim-bookworm`
+- `sudo docker image pull python:3.11.9-slim-bookworm`
 
 Notice the lines ending in `Already exists`. These lines tell us that Docker is smart enough to recognize when it’s being asked to pull an image layer that it already has a local copy of.
 
@@ -174,17 +176,13 @@ Notice the lines ending in `Already exists`. These lines tell us that Docker is 
 
 When you no longer need an image on your Docker host, you can delete it with the `docker image rm` command. `rm` is short for remove.
 
-Deleting an image will remove the image and all of its layers from your Docker host. This means it will no longer show up in `docker image ls` commands and all directories on the Docker host containing the layer data will be deleted. However, **if an image layer is shared by more than one image, that layer will not be deleted until all 
-images that reference it have been deleted**.
+Deleting an image will remove the image and all of its layers from your Docker host. This means it will no longer show up in `docker image ls` commands and all directories on the Docker host containing the layer data will be deleted. However, **if an image layer is shared by more than one image, that layer will not be deleted until all images that reference it have been deleted**.
 
 Delete the images pulled in the previous steps with the docker image rm command. The following example deletes an image by its ID, this might be different on your system.
 - `sudo docker image ls`
-- `sudo docker image rm python:3.9.13-slim-bullseye`
-- `sudo docker image rm python:3.9.13-bullseye`
+- `sudo docker image rm python:3.12.3-slim-bookworm`
+- `sudo docker image rm python:3.11.9-slim-bookworm`
 
 If the image you are trying to delete is in use by a running container you will not be able to delete it. Stop and delete any containers before trying the delete operation again.
 
-A handy **shortcut for deleting all images** on a Docker host is to run the `docker image rm` command and pass it
-a list of all image IDs on the system by calling `docker image ls` with the `-q` flag.
-- `sudo docker image rm $(sudo docker image ls -q)`
-
+A handy **shortcut for deleting all images** on a Docker host is to run the `sudo docker image prune -a` command. This command will remove all images that are not in use by a container.
