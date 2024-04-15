@@ -17,12 +17,12 @@
     - VMs are slow to boot, and portability isn’t great — migrating and moving VM workloads between hypervisors and cloud platforms is harder than it needs to be.
     - Results in wasted time and resources.
 
-### Linux containers
+### Containers
 - For a long time, the big web-scale players, like Google, have been using container technologies to address the shortcomings of the VM model.
 - In the container model, the container is roughly analogous to the VM. A major difference is that **containers do not require their own full-blown OS**. In fact, all containers on a single host share the host’s OS. This frees up huge amounts of system resources such as CPU, RAM, and storage. It also reduces potential licensing costs and reduces the overhead of OS patching and other maintenance.
 - **Containers are also fast to start and ultra-portable**. Moving container workloads from your laptop, to the cloud, and then to VMs or bare metal in your data center is a breeze.
 - Modern containers started in the Linux world and are the product of an immense amount of work from a wide variety of people over a long period of time.
-- Some of the major technologies that enabled the massive growth of containers in recent years include; kernel namespaces, control groups, union filesystems, and of course Docker.
+- Some of the major technologies that enabled the massive growth of containers in recent years include; kernel namespaces, control groups, union filesystem, and of course Docker.
 
 > There are many operating system virtualization technologies similar to containers that predate Docker and modern containers. Some even date back to System/360 on the Mainframe. BSD Jails and Solaris Zones are some other well-known examples of Unix-type container technologies.
 
@@ -113,7 +113,7 @@ The `--interactive` or `-i` flag tells Docker you want to set up a connection to
 The output will show Docker pulling the image, and then you’ll be left with a
 command prompt. That command prompt is for a terminal session inside the container.
 
-> [NARIŠEMO] When you hit Return, the Docker client packaged up the command and POSTed it to the API server running on the Docker daemon. The Docker daemon accepted the command and searched the Docker host’s local image repository to see if it already had a copy of the requested image. It didn’t, so it went to Docker Hub to see if it could find it there. It found it, pulled it locally, and stored it in its local cache. Once the image was pulled, the daemon instructed containerd and runc to create and start the container.
+> When you hit Return, the Docker client packaged up the command and POSTed it to the API server running on the Docker daemon. The Docker daemon accepted the command and searched the Docker host’s local image repository to see if it already had a copy of the requested image. It didn’t, so it went to Docker Hub to see if it could find it there. It found it, pulled it locally, and stored it in its local cache. Once the image was pulled, the daemon instructed containerd and runc to create and start the container.
 
 Either way, you’re now inside the container and you can run any commands that you can normally run in the command line for the operating system. Run the commands hostname and date and you’ll see details of
 the container’s environment:
@@ -168,8 +168,7 @@ Re-attach your terminal to it with the `docker container exec` command.
 - `sudo docker container exec -it <CONTAINER ID or NAME> bash`
 - Run inside the container: `ps -elf` (we see two bash shells)
 
-As you can see, the shell prompt has changed bach to the container. If you run the `ps -elf` command again you will now see two Bash or PowerShell processes. This is because the **docker container exec command created
-a new Bash or PowerShell process** and attached to that. **This means typing exit in this shell will not terminate the container**, because the original Bash or PowerShell process will continue running.
+As you can see, the shell prompt has changed bach to the container. If you run the `ps -elf` command again you will now see two Bash or PowerShell processes. This is because the **docker container exec command created a new Bash or PowerShell process** and attached to that. **This means typing exit in this shell will not terminate the container**, because the original Bash or PowerShell process will continue running.
 - `exit`
 - `sudo docker container ls`
 
@@ -186,12 +185,16 @@ Second, **containers don’t disappear when they exit**. Containers in the exite
 So what about starting containers that stay in the background and just keep running? That’s actually the main use case for Docker: running server applications like websites, batch processes, and databases.
 
 Here’s a simple example, running a website in a container:
-- `sudo docker container run --detach --publish 8088:80 nginx:1.23.0`
+- `sudo docker container run --name test-nginx --detach --publish 8088:80 nginx:1.23.0`
 
 This time the only output you’ll see is a long container ID, and you get returned to your command line. The **container is still running in the background**.
 
 Run `docker container ls` and you’ll see that the new container has the status Up:
 - `sudo docker container ls`
+- Enter the container: `sudo docker container exec -it test-nginx /bin/bash`
+    - Install ps: `apt update` and `apt install -y procps`
+    - Run inside the container: `ps -elf`
+    - Exit the container: `exit`
 
 When you run this container, you have a full web server running, hosting a custom website. Containers that sit in the background and listen for network traffic (HTTP requests in this case) need a couple of extra flags in the container run command:
 - `--detach` or `-d` — Starts the container in the background and shows the container ID
@@ -220,27 +223,30 @@ address 192.168.2.150. That’s the IP address for my physical network, and it w
 
 Browse to `http://<IP>:8088` on a browser. That’s an HTTP request to the local computer, but the response (see figure 2.7) comes from the container.
 
-A web developer can run a single container on their laptop, and the whole application—from the HTML to the web server stack— will be exactly the same as if an operator ran the app on 100 containers across a server cluster in production.
+A web developer can run a single container on their laptop, and the whole application — from the HTML to the web server stack — will be exactly the same as if an operator ran the app on 100 containers across a server cluster in production.
 
 The **application in this container keeps running indefinitely, so the container will keep running too**. You can use the `docker container` commands we’ve already used to manage it.
 
 `docker container stats` is another useful one: it shows a live view of how much CPU, memory, network, and disk the container is using.
-- `sudo docker container stats <CONTAINER ID or NAME>`
+- `sudo docker container stats test-nginx`
 
 When you’re done working with a container, **you can remove** it with `docker container rm` and the container ID, using the `--force` or `-f` flag to force removal if the container is still running.
-- `sudo docker container rm -f $(docker container ls -aq)`
+- `sudo docker container rm -f $(sudo docker container ls -aq)`
 
 The `$()` syntax sends the output from one command into another command — it works just as well on Linux and Mac terminals, and on Windows PowerShell. Combining these commands gets a list of all the container IDs on your computer, and **removes them all**.
+- `sudo docker ps -a`
 
 ## Exploring the container filesystem and the container lifecycle
 We will replace the `index.html` file so when you browse to the container you see a different homepage. Remember that the **container has its own filesystem**, and in this application, the website is serving files that are on the container’s filesystem.
 
-1. Run the NGINX web container: `sudo docker container run --name my-nginx -d -p 8080:80 nginx:latest`
+1. Run the NGINX web container: 
+    - `sudo docker container run --name my-nginx -d -p 8080:80 nginx:latest`
+    - Browse to `http://<IP>:8080` to see the default NGINX welcome page.
 2. Note down the start of the container ID so you can work with the container. You can also use the container name.
 3. Check if the webpage is working. 
 4. Check the HTML page in the container is in the [expected location](https://hub.docker.com/_/nginx/) (check the documentation): `sudo docker container exec my-nginx ls /usr/share/nginx/html`
 5. We know where the HTML file is inside the container, so we can use `docker container cp` to **copy a local file into the container**. This will overwrite the index.html file in the container with the file in my current directory: 
-    - Create a `index.html` file locally with some HTML content.
+    - Create a `index.html` file locally with the [following content](./index.html).
     - Copy the file: `sudo docker container cp index.html my-nginx:/usr/share/nginx/html/index.html`. The format of the cp command is `[source path] [target path]`. The container can be the source or the target, and you prefix the container file path with the container ID or name.
     - Refresh the webpage. 
     - Inside the container the web server returns the contents of the HTML file at the known location. Here we've overwritten the file inside the container with a new file from the local machine. Now when NGINX serves the page, it's the new content.
@@ -248,7 +254,7 @@ We will replace the `index.html` file so when you browse to the container you se
     - Attach to the container: `sudo docker exec -it my-nginx /bin/bash`
     - Inside the container run:
         - Move to data folder: `cd /usr/share/nginx/html`
-        - Install nano: `apt install` and `apt install -y nano`
+        - Install nano: `apt update` and `apt install -y nano`
         - Change the file: `nano index.html`
         - Refresh the webpage.
         - Exit the container `exit`.
@@ -264,7 +270,7 @@ We will replace the `index.html` file so when you browse to the container you se
     - Now let’s kill the container and delete it from the system: `sudo docker rm -f my-nginx`
     - You can stop, start, pause, and restart a container as many times as you want. It’s not until you explicitly delete a container that you run a chance of losing its data.
     - Run a new container: `sudo docker container run --name my-nginx -d -p 8080:80 nginx:latest`
-    - Refresh. We get the original contnet.
+    - Refresh. We get the original content.
     - Stop and remove the container: `sudo docker rm -f my-nginx`
 
 ## Stopping containers gracefully
