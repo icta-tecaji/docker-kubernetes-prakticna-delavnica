@@ -140,6 +140,10 @@ The `docker history` command is another way of inspecting an image and seeing la
 
 > An [example](https://hub.docker.com/layers/library/python/3.9.19-bookworm/images/sha256-c39e7db7ea07b57e384f4a70c08377a1af4404ec5dff514a973d9042714874bd?context=explore) of building a Python image..
 
+The writable container layer exists in the filesystem of the Docker host. It’s typically located on the Docker host in these locations: `/var/lib/docker/<storage-driver>/....`
+
+This thin writable layer is an integral part of a container and enables all read/write operations. If you, or an application, update files or add new files, they’ll be written to this layer. This writable layer of local storage is managed on every Docker host by a storage driver.
+
 Docker uses **storage drivers** to store image layers, and to store data in the writable layer of a container. Examples of storage drivers on Linux include `overlay2`, `fuse-overlayfs`, `btrfs`, `zfs`, and `vfs`.
 
 As their names suggest, each one is based on a Linux filesystem or block-device technology, and each has its own unique performance characteristics. No matter which storage driver is used, the user experience is the same.
@@ -151,7 +155,7 @@ The layers are stacked on top of each other. When you create a new container, yo
 ![container layer](./images/img04.jpg)
 <!-- Vir: https://docs.docker.com/storage/storagedriver/ -->
 
-The **container's writable layer doesn't persist after the container is deleted**, but is suitable for storing ephemeral data that is generated at runtime. So when the container is deleted, the writable layer is also deleted, but the underlying image remains unchanged.
+The **container's writable layer doesn't persist after the container is deleted**, but is suitable for storing ephemeral data that is generated at runtime. So when the container is deleted, the writable layer is also deleted, but the underlying image remains unchanged. (Stopping a container doesn’t automatically remove it, so a stopped container’s filesystem does still exist.)
 
 > Storage drivers are optimized for space efficiency, but (depending on the storage driver) write speeds are lower than native file system performance, especially for storage drivers that use a copy-on-write filesystem. Write-intensive applications, such as database storage, are impacted by a performance overhead, particularly if pre-existing data exists in the read-only layer. Use Docker volumes for write-intensive data.
 
@@ -160,6 +164,9 @@ The major difference between a container and an image is the top writable layer.
 ![container layer - multi](./images/sharing-layers.webp)
 <!-- Vir: https://docs.docker.com/storage/storagedriver/ -->
 
+A container **can edit existing files from the image layers.** But image layers are read-only, so Docker does some special magic to make that happen. It uses a **copy-on-write process** to allow edits to files that come from read-only layers. When the container tries to edit a file in an image layer, Docker actually makes a copy of that file into the writable layer, and the edits happen there. It’s all seamless for the container and the application, but it’s the cornerstone of Docker’s super-efficient use of storage.
+
+> Advanced explanation: [Understanding the copy-on-write mechanism](./The_copy_on_write_CoW_strategy.md)
 
 ### Sharing image layers
 

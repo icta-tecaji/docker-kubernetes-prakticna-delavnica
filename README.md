@@ -1,5 +1,9 @@
 # Praktična delavnica Docker & Kubernetes
 
+## Prerequisites
+- Clone this repository: `git clone https://github.com/icta-tecaji/docker-kubernetes-prakticna-delavnica.git`
+
+
 ## [Del 1: Intro To Docker](./01_Intro_To_Docker/README.md)
 - Docker overview
 - Why are containers and Docker so important?
