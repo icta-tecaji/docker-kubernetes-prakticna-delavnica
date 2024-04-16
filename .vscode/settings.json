@@ -1,5 +1,11 @@
 {
     "cSpell.words": [
-        "tmpfs"
+        "intercontainer",
+        "ipvlan",
+        "macvlan",
+        "nmap",
+        "pluggable",
+        "tmpfs",
+        "uncontained"
     ]
 }
