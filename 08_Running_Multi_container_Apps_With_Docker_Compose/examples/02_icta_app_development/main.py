@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
+import os
+
 import redis.asyncio as redis
 from fastapi import FastAPI
 from pydantic import BaseModel
 from redis import exceptions
 
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+
 app = FastAPI()
-redis_conn = redis.Redis(host="icta-app-redis", port=6379)
+redis_conn = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
 
 
 class TotalHits(BaseModel):

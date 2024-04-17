@@ -96,9 +96,9 @@
 ## [Del 8: Running Multi-container Apps With Docker Compose](./08_Running_Multi_container_Apps_With_Docker_Compose/README.md)
 - Overview of Docker Compose and installation
 - Compose background
-- Running a application with Compose: counter-app
-- Development with Compose
-- Production deployment with Compose: counter-app
+- Running a application with Compose: icta_app_minimal
+- Development with Compose: icta_app_development
+- Production deployment with Compose: icta_app_production
 - Scaling and Load Balancing using Compose
 - Advanced Compose features (Advanced)
 
