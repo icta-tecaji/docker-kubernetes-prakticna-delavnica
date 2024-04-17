@@ -1,17 +1,34 @@
 {
-    "cSpell.words": [
-        "Buildx",
-        "Dockerfiles",
-        "intercontainer",
-        "ipvlan",
-        "ltfe",
-        "macvlan",
-        "nmap",
-        "pluggable",
-        "simpleweb",
-        "Snyk",
-        "tmpfs",
-        "uncontained",
-        "WORKDIR"
-    ]
+  "python.languageServer": "Pylance",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.diagnosticMode": "workspace",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "charliermarsh.ruff",
+  "editor.tabSize": 4,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports.ruff": "explicit",
+    "source.addMissingImports": "explicit",
+    "source.formatDocument.ruff": "explicit",
+    "source.fixAll.ruff": "explicit"
+  },
+  "ruff.importStrategy": "fromEnvironment",
+  "ruff.lint.args": ["--select=ALL", "--line-length=180"],
+  "ruff.format.args": ["--line-length=170"],
+  "cSpell.words": [
+    "Buildx",
+    "Dockerfiles",
+    "fastapi",
+    "icta",
+    "intercontainer",
+    "ipvlan",
+    "ltfe",
+    "macvlan",
+    "nmap",
+    "pluggable",
+    "simpleweb",
+    "Snyk",
+    "tmpfs",
+    "uncontained",
+    "WORKDIR"
+  ]
 }

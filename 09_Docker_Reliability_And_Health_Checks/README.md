@@ -1,5 +1,7 @@
 # Docker Reliability And Health Checks
 
+<!-- TODO: dodaj primer za našo aplikaicjo -->
+
 ## Self-healing containers with restart policies
 Docker monitors the health of your app at a basic level every time you run a container. Containers run a specific process when they start and Docker **checks that the process is still running**, and if it stops, the container goes into the exited state. That gives you a basic health check that works across all environments. Developers can see that their app is unhealthy if the process fails and the container exits.
 

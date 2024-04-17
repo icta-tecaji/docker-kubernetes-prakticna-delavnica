@@ -3,7 +3,9 @@
 ## Overview of Docker Compose and installation
 Compose is a tool for defining and running **multi-container Docker applications in single-engine mode**. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration. 
 
-> **Compose V2 and the new docker compose command**: The new Compose V2, which supports the `compose` command as part of the Docker CLI, is now available. Compose V2 integrates compose functions into the Docker platform, continuing to support most of the previous `docker-compose` features and flags. You can run Compose V2 by replacing the hyphen (-) with a space, using `docker compose`, instead of `docker-compose`. [Compose command compatibility with docker-compose](https://docs.docker.com/compose/cli-command-compatibility/).
+> **Compose V2 and the new docker compose command**: Effective July 2023, Compose V1 stopped receiving updates and is no longer in new Docker Desktop releases. Compose V2 has replaced it and is now integrated into all current Docker Desktop versions. You can run Compose V2 by replacing the hyphen (-) with a space, using `docker compose`, instead of `docker-compose`. [Compose command compatibility with docker-compose](https://docs.docker.com/compose/cli-command-compatibility/).
+
+![compose-v1-vs-v2](./images/v1-versus-v2.png)
 
 [Compose installation scenarios](https://docs.docker.com/compose/install/):
 - (Mac, Win, Linux) Docker Desktop: If you have Desktop installed then you already have the Compose plugin installed.
@@ -34,14 +36,19 @@ Main features of Compose:
 
 ## Running a application with Compose: counter-app
 
+<!-- # TODO: update https://docs.docker.com/compose/compose-application-model/ -->
+<!-- https://docs.docker.com/compose/gettingstarted/ -->
+<!-- https://docs.docker.com/compose/use-secrets/ -->
+
 Compose uses YAML files to define multi-service applications. The default name for a Compose YAML file is `docker-compose.yml`. However, you can use the `-f` flag to specify custom filenames.
 
 The following example shows a very simple Compose file that defines a small **Flask app with two microservices** (web-fe and redis). The app is a simple web server that **counts the number of visits to a web page** and stores the value in Redis.
 
-The Compose file can be found here: `cat ~/docker-k8s/08_Running_Multi_container_Apps_With_Docker_Compose/examples/01_counter-app/docker-compose.yml`
+The Compose file can be found here: `cat 08_Running_Multi_container_Apps_With_Docker_Compose/examples/01_icta_app_minimal/docker-compose.yml`
 
 > The most current, and recommended [Compose Specification](https://docs.docker.com/compose/compose-file/).
 
+<!-- # add https://docs.docker.com/compose/compose-file/04-version-and-name/#name-top-level-element -->
 The first thing to note is that the file has 4 top-level keys:
 - `version` (DEPRECATED): The version key was **mandatory**, and it’s **always the first line at the root of the file**. this defines the version of the
 Compose file format (basically the API). You should normally use the latest version. It’s important to note that the versions key does not define the version of Docker Compose or the Docker Engine. [Compose file versions and upgrading](https://docs.docker.com/compose/compose-file/compose-versioning/). **NEW:** Top-level version property is defined by the specification for backward compatibility but is only informative.
@@ -105,7 +112,7 @@ Managing an app with Compose:
 
 ## Development with Compose
 
-We can use Copose in the devlopment stage for our apps:
+We can use Compose in the development stage for our apps:
 - Move to: `cd ~/docker-k8s/08_Running_Multi_container_Apps_With_Docker_Compose/examples/02-counter-app-dev`
 - Check the `docker-compose.dev.yml` file in your project directory.
   - The new volumes key mounts the project directory (current directory) on the host to `/code` inside the container, **allowing you to modify the code on the fly, without having to rebuild the image**. 
@@ -140,6 +147,8 @@ Moving along, for production environments, we need to add the following:
 - Stop the app: `docker compose -f docker-compose.prod.yml down -v`
 
 ## Scaling and Load Balancing using Compose
+
+<!-- TODO: naredi skripto ki ful kliče endpinte -->
 
 Each service defined in Docker compose configuration can be scaled. The `web-fe` service is effectively stateless, so you can scale it up to run on multiple containers. When the `nginx` container requests data from the `web-fe`, Docker will share those requests across the running `web-fe` containers.
 
