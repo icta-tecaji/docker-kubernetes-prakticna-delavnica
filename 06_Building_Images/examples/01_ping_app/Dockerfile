@@ -1,4 +1,6 @@
-FROM node:18-alpine
+# syntax=docker/dockerfile:1
+
+FROM node:20-alpine
 
 ENV TARGET="ltfe.org"
 ENV METHOD="HEAD"

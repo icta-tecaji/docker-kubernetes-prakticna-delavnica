@@ -1,6 +1,6 @@
 # More best practices for writing Dockerfiles (Advanced) 
 
-## Viri
+## Sources
 - [Best practices for writing Dockerfiles](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)
 - [Docker development best practices](https://docs.docker.com/develop/dev-best-practices/)
 - [Image-building best practices](https://docs.docker.com/get-started/09_image_best/)

@@ -1,4 +1,5 @@
-# VARIABLES
+# syntax=docker/dockerfile:1
+
 ARG version=3.10.6
 
 ###########

@@ -1,11 +1,17 @@
 {
     "cSpell.words": [
+        "Buildx",
+        "Dockerfiles",
         "intercontainer",
         "ipvlan",
+        "ltfe",
         "macvlan",
         "nmap",
         "pluggable",
+        "simpleweb",
+        "Snyk",
         "tmpfs",
-        "uncontained"
+        "uncontained",
+        "WORKDIR"
     ]
 }

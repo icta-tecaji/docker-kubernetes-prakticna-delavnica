@@ -64,6 +64,7 @@
 - Docker and iptables (Advanced)
 
 ## [Del 6: Building Images](./06_Building_Images/README.md)
+- Overview of Docker Build
 - Containerizing an app - overview
 - Building your first container image
 - Understanding Docker images and image layers
