@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import socket
 
 import redis.asyncio as redis
 from fastapi import FastAPI
@@ -20,6 +21,7 @@ class TotalHits(BaseModel):
     """Model for total hits on the server."""
 
     hits: int | None = None
+    hostname: str
 
 
 async def get_hit_count() -> int | None:
@@ -35,4 +37,4 @@ async def get_hit_count() -> int | None:
 async def get_total_hits() -> TotalHits:
     """Get total hits on the server."""
     count = await get_hit_count()
-    return TotalHits(hits=count)
+    return TotalHits(hits=count, hostname=socket.gethostname())

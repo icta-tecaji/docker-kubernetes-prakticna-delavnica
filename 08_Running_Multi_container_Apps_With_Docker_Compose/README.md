@@ -68,7 +68,9 @@ It’s important to understand that Compose will deploy each of these as a conta
     - `tty`: This tells Docker to allocate a pseudo-TTY for the container. This is useful for running interactive commands in the container and better output formatting.
     - `ports`: Tells Docker to map port 8000 inside the container to port 80 on the host. This means that traffic sent to the Docker host on port 80 will be directed to port 8000 on the container. The app inside the container listens on port 8000.
     - `networks`: Tells Docker which network to attach the service’s container to. The network should already exist, or be defined in the networks top-level key.
+
     > By default Compose sets up a single network for your app. Each container for a service joins the default network and is both reachable by other containers on that network, and discoverable by them at a hostname identical to the container name.
+
 - `icta-app-redis`
     - `image`: this tells Docker to start a standalone container called redis based on the redis:alpine image. This image will be pulled from Docker Hub.
     - `volumes`: Tells Docker to mount the icta-app-redis-data volume to /data inside the container. The icta-app-redis-data volume needs to already exist, or be defined in the volumes top-level key at the bottom of the file.
@@ -110,6 +112,7 @@ We can use Compose in the development stage for our apps:
   - The command was changed to enable **the app reload on code changes.** This mode should only be used in development.
 - From your project directory, type docker compose up to build the app with the updated Compose file, and run it.
   - `sudo docker compose -f docker-compose.dev.yml up -d --build`
+  - `sudo docker compose -f docker-compose.dev.yml ps`
   - Check the page in a web browser again, and refresh to see the count increment.
   - Because the application code is now mounted into the container using a volume, you can **make changes to its code** and see the changes instantly, without having to rebuild the image.
   - Change the `main.py` file with the content of the `main_updated.py` file and save it. Refresh the app in your browser. The app should be updated, and the counter should still be incrementing.
@@ -121,6 +124,7 @@ Moving along, for production environments, we need to add the following:
 - Move to folder: `cd ~/docker-kubernetes-prakticna-delavnica/08_Running_Multi_container_Apps_With_Docker_Compose/examples/03_icta_app_production`
 - A new Dockerfile called `Dockerfile.prod` for use with production builds. We used a Docker multi-stage build to reduce the final image size.
 - Build the image: `sudo docker build -t leon11sj/icta-app:v1.0 -f ./Dockerfile.prod .`
+  - `sudo docker image ls`: The new image should be smaller than the development image.
 - Create a new Compose file called `docker-compose.prod.yml` for production.
   - Add new networks
   - `depends_on` expresses startup and shutdown dependencies between services.
@@ -129,10 +133,10 @@ Moving along, for production environments, we need to add the following:
 - Show the logs of the app: `sudo docker compose -f docker-compose.prod.yml logs -f`
 - Check the app: `http://<IP>/hits`
 - Check the page in a web browser again, and refresh to see the count increment.
-- Try to call the API with the prepared script:
+- Try to call the API with the prepared script (from another terminal):
   - `chmod +x test_api_script.sh`
   - Call tha API once per second: `./test_api_script.sh <URL> 1`
-  - Try to call without sleep: `./test_api_script.sh <URL> 0`
+  - Try to call without sleep: `./test_api_script.sh <URL> 0.01`
 - Stop the app: `sudo docker compose -f docker-compose.prod.yml down -v`
 
 ## Scaling and Load Balancing using Compose
@@ -142,9 +146,10 @@ Each service defined in Docker compose configuration can be scaled. The `icta-ap
 In the same terminal session, use Docker Compose to increase the scale of the `icta-app-api` service, and then refresh the web page a few times and check the hostname of the containers:
 - `sudo docker compose -f docker-compose.prod.yml up -d`
 - `sudo docker compose -f docker-compose.prod.yml ps`
-- Try to call the script without sleep: `./test_api_script.sh <URL> 0` (from another terminal)
-- Scale up: `sudo docker compose -f docker-compose.prod.yml up -d --scale icta-app-api=3`
-- `sudo docker compose -f docker-compose.prod.yml ps`
+- Try to call the script without sleep: `./test_api_script.sh <URL> 0.01` (from another terminal)
+- Scale up: 
+  - `sudo docker compose -f docker-compose.prod.yml up -d --scale icta-app-api=3`
+  - `sudo docker compose -f docker-compose.prod.yml ps`
 
 Docker Compose is a client-side tool. It’s a command line that sends instructions to the Docker API based on the contents of the Compose file. Docker itself just runs containers; it isn’t aware that many containers represent a single application. Only Compose knows that, and Compose only knows the structure of your application by looking at the Docker Compose YAML file, so you need to have that file available to manage your app.
 
@@ -152,7 +157,7 @@ Docker Compose is a client-side tool. It’s a command line that sends instructi
 
 Containers plugged into the same Docker network will get IP addresses in the same network range, and they connect over that network. Using DNS means that when your containers get replaced and the IP address changes, your app still works because the DNS service in Docker will always return the current container’s IP address from the domain lookup.
 
-Connect to a session in the `nginx` container and perform a DNS lookup: `docker container exec -it icta-app_icta-app-nginx_01 sh`
+Connect to a session in the `nginx` container and perform a DNS lookup: `sudo docker container exec -it icta-app-icta-app-nginx-1 sh`
 - `nslookup icta-app-api`
 - `ping icta-app-api` 
 - `ping icta-app-api` 
