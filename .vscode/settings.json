@@ -16,6 +16,7 @@
   "ruff.format.args": ["--line-length=170"],
   "cSpell.words": [
     "Buildx",
+    "delavnica",
     "Dockerfiles",
     "fastapi",
     "icta",
@@ -25,6 +26,7 @@
     "macvlan",
     "nmap",
     "pluggable",
+    "prakticna",
     "simpleweb",
     "Snyk",
     "tmpfs",

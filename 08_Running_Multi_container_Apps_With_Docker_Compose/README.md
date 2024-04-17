@@ -34,17 +34,20 @@ Main features of Compose:
 
 **The Docker Compose file describes the desired state of your app—what it should look like when everything’s running.**
 
-## Running a application with Compose: counter-app
-
-<!-- # TODO: update https://docs.docker.com/compose/compose-application-model/ -->
-<!-- https://docs.docker.com/compose/gettingstarted/ -->
-<!-- https://docs.docker.com/compose/use-secrets/ -->
+## Running a application with Compose: icta_app_minimal
 
 Compose uses YAML files to define multi-service applications. The default name for a Compose YAML file is `docker-compose.yml`. However, you can use the `-f` flag to specify custom filenames.
 
-The following example shows a very simple Compose file that defines a small **Flask app with two microservices** (web-fe and redis). The app is a simple web server that **counts the number of visits to a web page** and stores the value in Redis.
+The following example shows a very simple Compose file that defines a small **FastApi app with two microservices** (icta-app-api and icta-app-redis). The app is a simple web server that **counts the number of visits to a web page** and stores the value in Redis.
 
-The Compose file can be found here: `cat 08_Running_Multi_container_Apps_With_Docker_Compose/examples/01_icta_app_minimal/docker-compose.yml`
+The app files can be found here (check the files): 
+  - `cd docker-kubernetes-prakticna-delavnica/`  
+  - `cd 08_Running_Multi_container_Apps_With_Docker_Compose/examples/01_icta_app_minimal`
+  - `ls -la`
+  - `cat main.py` (the application code)
+  - `cat Dockerfile` (describes how to build the image)
+  - `cat requirements.txt` (lists the Python packages required for the app)
+  - `cat docker-compose.yml` (the Compose file)
 
 > The most current, and recommended [Compose Specification](https://docs.docker.com/compose/compose-file/).
 
@@ -73,10 +76,6 @@ Each of these defines a service (container) in the app. It’s important to unde
 
 The service name becomes the container name and the DNS name of the container, which other containers can use to connect on the Docker network. As both services will be deployed onto the same counter-net network, they **will be able to resolve each other by name**. This is important as the application is configured to communicate with the redis service by name.
 
-Check the files (`cd ~/docker-k8s/08_Running_Multi_container_Apps_With_Docker_Compose/examples/01-counter-app`):
-- `app.py`: is the application code (a Python Flask app)
-- `requirements.txt`: lists the Python packages required for the app
-- `Dockerfile`: describes how to build the image for the web-fe service
 
 > **Handling transient errors:** Note the way the get_hit_count function is written. This basic retry loop lets us attempt our request multiple times if the redis service is not available. This is useful at startup while the application comes online, but also makes our application more resilient if the Redis service needs to be restarted anytime during the app’s lifetime. In a cluster, this also helps handling momentary connection drops between nodes.
 
@@ -109,6 +108,11 @@ Managing an app with Compose:
 - `sudo docker compose restart`: Restart the app
 - `sudo docker compose ps`
 - `sudo docker compose down -v`: Stop and delete the app and the volumes
+
+
+<!-- # TODO: update https://docs.docker.com/compose/compose-application-model/ -->
+<!-- https://docs.docker.com/compose/gettingstarted/ -->
+<!-- https://docs.docker.com/compose/use-secrets/ -->
 
 ## Development with Compose
 
