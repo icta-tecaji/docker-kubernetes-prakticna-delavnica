@@ -71,14 +71,14 @@
 - Understanding the image layer cache
 - Understand how CMD and ENTRYPOINT interact
 - Difference between the COPY and ADD commands
-- Using the VOLUME command inside Dockerfiles
+- Using the VOLUME command inside a Dockerfile
 - Run containers as non-root user
 - Best practices for writing Dockerfiles
 - Example: Build a Python application
 - Use multi-stage builds
+- Build secrets
 - More best practices for writing Dockerfiles (Advanced) 
 - Building Docker images from a container (Advanced)
-- Build images with BuildKit (Advanced)
 - Building and Testing Multi-Arch Images (Advanced)
 - Building Wasm Images (Advanced)
 - Generate the SBOM for Docker images (Advanced)
