@@ -144,5 +144,5 @@ This is a **typical versioning scheme you’ll see for Docker images**. It’s o
 It’s **especially important to use specific image tags for the base images in your own Dockerfiles**. It’s great to use the product team’s build tools image to build your apps and their runtime image to package your apps, but if you don’t specify versions in the tags, you’re setting yourself up for trouble in the future. A new release of the build image could break your Docker build. Or worse, a new release of the runtime could break your application.
 
 ## Configure the credentials store (Advanced)
-- https://docs.docker.com/engine/reference/commandline/login/#credentials-store
 
+More [here](https://docs.docker.com/reference/cli/docker/login/#configure-the-credential-store).
