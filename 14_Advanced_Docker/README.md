@@ -1,34 +1,18 @@
 # Advanced Docker
 
-## Podman
-
-More [here](./podman.md).
-
 ## Run the Docker daemon as a non-root user - Rootless mode (Advanced)
 
 More [here](./docker_rootless.md).
 
-## Other
+## Podman
 
-Containers and isolation features have existed for decades. Docker uses Linux namespaces
-and cgroups, which have been part of Linux since 2007. 
+More [here](./podman.md).
 
-Docker builds containers using 10 major system features. Part 1 of this book uses
-Docker commands to illustrate how these features can be modified to suit the needs
-of the contained software and to fit the environment where the container will run.
-The specific features are as follows:
-- PID namespace—Process identifiers and capabilities
-- UTS namespace—Host and domain name
-- MNT namespace—Filesystem access and structure
-- IPC namespace—Process communication over shared memory
-- NET namespace—Network access and structure
-- USR namespace—User names and identifiers
-- chroot syscall—Controls the location of the filesystem root
-- cgroups—Resource protection
-- CAP drop—Operating system feature restrictions
-- Security modules—Mandatory access controls
-
+<!-- 
+- Controlling HTTP traffic to containers with a reverse proxy
+- Asynchronous communication with a message queue
+- https://medium.com/@saschagrunert/demystifying-containers-part-i-kernel-space-2c53d6979504
 
 Docker init:
 - Docker Init,https://www.docker.com/blog/docker-init-initialize-dockerfiles-and-compose-files-with-a-single-cli-command/
-- https://docs.docker.com/engine/reference/commandline/init/
+- https://docs.docker.com/engine/reference/commandline/init/ -->

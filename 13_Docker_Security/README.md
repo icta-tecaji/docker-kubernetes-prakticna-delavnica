@@ -1,19 +1,27 @@
 # Docker Security
 
+## Sources
+- [Security](https://docs.docker.com/security/)
+- [Docker security](https://docs.docker.com/engine/security/)
+- [5 Developer Workstation Security Best Practices](https://www.docker.com/blog/developer-workstation-security-best-practices/)
+- [What is the Best Container Security Workflow for Your Organization?](https://www.docker.com/blog/what-is-the-best-container-security-workflow/)
+- [What is container security?](https://snyk.io/learn/container-security/)
+
+
+## Docker security overview
+There are four major areas to consider when reviewing Docker security:
+- The intrinsic security of the kernel and its support for namespaces and cgroups
+- The attack surface of the Docker daemon itself
+- Loopholes in the container configuration profile, either by default, or when customized by users.
+- The "hardening" security features of the kernel and how they interact with containers.
 
 ## Container security
-- https://snyk.io/learn/container-security/
-- https://snyk.io/blog/secure-your-kubernetes-applications-with-snyk-container/
-- https://snyk.io/blog/snyk-container-registry-security-integrations-github-gitlab-nexus-digitalocean/
--https://snyk.io/learn/container-security/container-monitoring/
-
 Vulnerabilities can be introduced to containers in a number of ways: 
 - from the software inside the container, 
 - how the container interacts with the host operating system and adjacent containers, 
 - the configurations for networking and storage
 - from other images that your containers rely on
     - your container image may be based on a publicly available image that contains known vulnerabilities and malware, especially if you didn’t download the image from a verified publisher and authenticate the image publisher and contents
-
 
 ## Container scanning
 
@@ -36,6 +44,24 @@ Each new layer has the risk of introducing new vulnerabilities into the containe
 > **How does Container scanning work?** Scanning containers for vulnerabilities usually involves a security tool that analyzes a container image layer by layer to detect potential security issues. Most scanning solutions leverage a database of known vulnerabilities so that organizations can stay up-to-date as the security threat landscape evolves. Containerized applications also consist of multiple components, including custom code, open source dependencies, images, Dockerfiles, and more. Scanning for vulnerabilities across all of these components is critical for comprehensive container security.
 
 
-- https://docs.docker.com/get-started/09_image_best/#security-scanning
-- https://www.docker.com/blog/what-is-the-best-container-security-workflow/
-- https://www.docker.com/blog/developer-workstation-security-best-practices/
+<!-- - Understanding users
+    - Working with the run-as user -->
+
+<!-- ## Other
+Containers and isolation features have existed for decades. Docker uses Linux namespaces
+and cgroups, which have been part of Linux since 2007. 
+
+Docker builds containers using 10 major system features. Part 1 of this book uses
+Docker commands to illustrate how these features can be modified to suit the needs
+of the contained software and to fit the environment where the container will run.
+The specific features are as follows:
+- PID namespace—Process identifiers and capabilities
+- UTS namespace—Host and domain name
+- MNT namespace—Filesystem access and structure
+- IPC namespace—Process communication over shared memory
+- NET namespace—Network access and structure
+- USR namespace—User names and identifiers
+- chroot syscall—Controls the location of the filesystem root
+- cgroups—Resource protection
+- CAP drop—Operating system feature restrictions
+- Security modules—Mandatory access controls -->

@@ -111,34 +111,26 @@
 - Defining health checks and dependency checks in Docker Compose
 
 ## [Del 10: Managing Application Logs](./10_Managing_Application_Logs/README.md)
-- https://sematext.com/guides/docker-logs/
-- https://docs.docker.com/config/containers/logging/configure/
+- Docker logging overview
+- Configure logging drivers
 
-## [Del 11: Monitoring](./11_Monitoring/README.md)
-- Portainer
+## [Del 11: Monitoring And Management](./11_Monitoring_And_Management/README.md)
+- Installing Portainer CE
 
 ## [Del 12: Docker Configuration Management](./12_Docker_Configuration_Management/README.md)
-- env variables ES-34
-- use secret config 
+- Secrets configuration in Docker Compose
 
 ## [Del 13: Docker Security](./13_Docker_Security/README.md)
+- Docker security overview
 - Container security
 - Container scanning
-- Understanding users
-    - Working with the run-as user
-- https://docs.docker.com/network/iptables/#restrict-connections-to-the-docker-host
-- https://docs.docker.com/security/
 
 ## [Del 14: Advanced Docker](./14_Advanced_Docker/README.md)
-- Podman
 - Run the Docker daemon as a non-root user - Rootless mode (Advanced)
-- Controlling HTTP traffic to containers with a reverse proxy
-
-- Asynchronous communication with a message queue
-- https://medium.com/@saschagrunert/demystifying-containers-part-i-kernel-space-2c53d6979504
+- Podman
 
 ## [Del 15: Docker Exercises](./15_Docker_Exercises/README.md)
-- praktični primeri realnih aplikaciji
+- 12 Factor Application
 
 ## [Del 16: Container orchestration and microservices](./16_Container_orchestration_and_microservices/README.md)
 - Traditional applications

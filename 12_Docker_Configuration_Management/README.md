@@ -1,9 +1,12 @@
+# Docker Configuration Management
+
+## Sources
+- [How to use secrets in Docker Compose](https://docs.docker.com/compose/use-secrets/)
 
 
-- secrets
-- ES 110
-- configuration in compose and secreats in compose, show usecases
+## Secrets configuration in Docker Compose
+A secret is any piece of data, such as a password, certificate, or API key, that shouldn’t be transmitted over a network or stored unencrypted in a Dockerfile or in your application’s source code.
 
-
-https://docs.docker.com/compose/compose-application-model/
-<!-- https://docs.docker.com/compose/use-secrets/ -->
+<!-- - ES 110 -->
+<!-- - env variables ES-34
+- use secret config  -->
