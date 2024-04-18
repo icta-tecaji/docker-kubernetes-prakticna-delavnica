@@ -108,7 +108,6 @@
 - Understanding PID 1 in Docker containers
 - Docker Resource Management (Advanced)
 - Building health checks into Docker images
-- Starting containers with dependency checks
 - Defining health checks and dependency checks in Docker Compose
 
 ## [Del 10: Managing Application Logs](./10_Managing_Application_Logs/README.md)
