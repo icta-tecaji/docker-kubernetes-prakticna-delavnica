@@ -16,10 +16,12 @@
   "ruff.format.args": ["--line-length=170"],
   "cSpell.words": [
     "Buildx",
+    "cpus",
     "delavnica",
     "Dockerfiles",
     "fastapi",
     "gethostname",
+    "HEALTHCHECK",
     "icta",
     "intercontainer",
     "ipvlan",

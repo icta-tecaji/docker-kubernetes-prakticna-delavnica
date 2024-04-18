@@ -4,7 +4,7 @@ services:
   icta-app-api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.health
     tty: true
     ports:
       - "80:8000"

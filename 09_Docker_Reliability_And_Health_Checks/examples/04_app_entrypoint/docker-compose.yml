@@ -1,7 +1,7 @@
 services:
   app:
     container_name: app
-    command: python3 /code/app.py
+    command: python3 -u /code/app.py
     build: .
   db:
     image: postgres:13-alpine

@@ -58,19 +58,25 @@ Docker Compose allows us to configure restart policies to manage multiple contai
 Try the following:
 - Move to folder: `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/00_restart_polcy`
 - Check the `docker-compose.yml` file.
-- Run the app: `docker compose up --build`
+- Run the app: `sudo docker compose up -d --build`
+    - `sudo docker compose logs -f`
     - The container restarts after the error.
-- Stop the app: `docker compose down`
+- Stop the app: `sudo docker compose down`
+- Change the exit code to 0: `sys.exit(0)` in the `app.py` file.
+- Run the app: `sudo docker compose up -d --build`
+    - `sudo docker compose logs -f`
+    - The container restarts after finished.
+- Stop the app: `sudo docker compose down`
 - Change the `restart` filed to `on-failure` in the `docker-compose.yml` file.
-- Run the app: `docker compose up --build`
-- Check: `docker compose ps` and `docker compose logs -f`.
-    - The app is restarting
-- Stop the app: `docker compose down`
-- Uncomment the `sys.exit(0)` line in the `app.py` file.
-- Run the app: `docker compose up --build`
-- Check: `docker compose ps` and `docker compose logs`.
-    - The container exited and stopped (no restart).
-- Stop the app: `docker compose down`
+- Run the app: `sudo docker compose up --build`
+- Check: `sudo docker compose ps` and `udo docker compose logs -f`.
+    - The app is not restarting. The container exited on code 0 (success).
+- Stop the app: `sudo docker compose down`
+- Change the exit code to 1: `sys.exit(1)` in the `app.py` file.
+- Run the app: `sudo docker compose up -d --build`
+- Check: `sudo docker compose logs -f`.
+    - The container is restarting after the error.
+- Stop the app: `sudo docker compose down`
 
 ## Understanding PID 1 in Docker containers
 
@@ -78,52 +84,56 @@ An init system is a program that’s used to launch and maintain the state of ot
 
 A process running as PID 1 inside a container is treated specially by Linux: it ignores any signal with the default action. As a result, the process will not terminate on SIGINT or SIGTERM unless it is coded to do so.
 - Move to folder: `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/01_app_no_signal_handling`
-- Build the image: `docker build -t pid-01 .`
-- Run: `docker run -d --name pid-01 pid-01`
-- Look at the logs: `docker logs pid-01 -f`
-- `docker ps`
-- We are running Python as PID 1: `docker exec pid-01 ps -a`
-- Send a SIGTERM (15) signal to a process: `docker exec pid-01 kill -15 1` (the process will not terminate)
-- `docker ps`
-- Try to stop the container: `docker stop pid-01`. It's takes 10s to stop the contianer. The main process inside the container will receive `SIGTERM`, and after a grace period, `SIGKILL`. The default grace period (seconds to wait for stop before killing it) is 10s. It's can be changed with the `-t` flag.
-- `docker rm pid-01`
+- Build the image: `sudo docker build -t pid-01 .`
+- Run: `sudo docker run -d --name pid-01 pid-01`
+- Look at the logs: `sudo docker logs pid-01 -f`
+- `sudo docker ps`
+- We are running Python as PID 1: `sudo docker exec pid-01 ps aux`
+- Send a SIGTERM (15) signal to a process: `sudo docker exec pid-01 kill -15 1` (the process will not terminate)
+- `sudo docker ps`
+- Try to stop the container: sudo `sudo docker stop pid-01`. It's takes 10s to stop the contianer. The main process inside the container will receive `SIGTERM`, and after a grace period, `SIGKILL`. The default grace period (seconds to wait for stop before killing it) is 10s. It's can be changed with the `-t` flag.
+- `sudo docker rm pid-01`
 
 We added some signal handling in the next example: 
 - `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/02_app_with_signal_handling`
-- Build the image: `docker build -t pid-02 .`
-- Run: `docker run -d --name pid-02 pid-02`
-- `docker ps`
-- We are running Python as PID 1: `docker exec pid-02 ps -a`
-- Run the logs in a **different terminal window**: `docker logs pid-02 -f`
-- Send a SIGTERM (15) signal to a process: `docker exec pid-02 kill -15 1` (the proccess shutdown gracefully)
-- `docker ps -a`
-- `docker rm pid-02`
-- Run: `docker run -d --name pid-02 pid-02`
-- Run the logs in a **different terminal window**: `docker logs pid-02 -f`
-- Try to stop the container: `docker stop pid-02` (the container shutdown immediately)
-- `docker rm pid-02`
+- Build the image: `sudo docker build -t pid-02 .`
+- Run: `sudo docker run -d --name pid-02 pid-02`
+- `sudo docker ps`
+- We are running Python as PID 1: `sudo docker exec pid-02 ps aux`
+- Run the logs in a **different terminal window**: `sudo docker logs pid-02 -f`
+- Send a SIGTERM (15) signal to a process: `sudo docker exec pid-02 kill -15 1` (the proccess shutdown gracefully)
+- `sudo docker ps -a`
+- `sudo docker rm pid-02`
+- Run: `sudo docker run -d --name pid-02 pid-02`
+- Run the logs in a **different terminal window**: `sudo docker logs pid-02 -f`
+- Try to stop the container: `sudo docker stop pid-02` (the container shutdown immediately)
+- `sudo docker rm pid-02`
 
 The ENTRYPOINT instruction can also be used in combination with a helper script, allowing it to function in a similar way to the command above, even when starting the tool may require more than one step. For example we can use the `entrypoint.sh` to verify that Postgres is up and healthy before creating our app. 
 - Move to folder: `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/03_app_entrypoint_problem/`
-- `docker compose up --build`
+- `sudo docker compose up --build`
 - In the logs we can see that the script is waiting for the database to start.
 - Open a new terminal window:
     - `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/03_app_entrypoint_problem/`
-    - `docker ps -a`
-    - Look at the processes in the contianer: `docker exec app ps -aux`.  The `entrypoint.sh` shell script has PID 1, and our `app.py` Python program will have another PID. PID 1 processes in Linux do not have any default signal handlers and as a result will not receive and propogate signals. They are also expected to take on certain responsibilities, such as adopting orphaned processes, and reaping zombie processes.
-    - Stop: `docker compose down`. The proccess don't shutdown gracefully.
+    - `sudo docker ps -a`
+    - Look at the processes in the contianer: `sudo docker exec app ps -aux`.  The `entrypoint.sh` shell script has PID 1, and our `app.py` Python program will have another PID. PID 1 processes in Linux do not have any default signal handlers and as a result will not receive and propogate signals. They are also expected to take on certain responsibilities, such as adopting orphaned processes, and reaping zombie processes. There also is no logging of the Python process in the logs.
+    - Stop: `sudo docker compose down`. The proccess don't shutdown gracefully.
 
 We can try with the following solution:
 - `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/04_app_entrypoint/`
 - The `entrypoint.sh` script uses the exec Bash command so that the final running application becomes the container’s PID 1. This allows the application to receive any Unix signals sent to the container.
-- `docker compose up --build`
+- `sudo docker compose up --build`
 - Open a new terminal window:
     - `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/04_app_entrypoint/`
-    - `docker ps -a`
-    - Look at the processes in the contianer: `docker exec app ps -aux`
-    - Stop: `docker compose down`. The proccess shutdown gracefully.
+    - `sudo docker ps -a`
+    - Look at the processes in the contianer: `sudo docker exec app ps -aux`
+    - Stop: `sudo docker compose down`. The proccess shutdown gracefully.
 
 ## Docker Resource Management (Advanced)
+- [Runtime options with Memory, CPUs, and GPUs](https://docs.docker.com/config/containers/resource_constraints/)
+- [resources](https://docs.docker.com/compose/compose-file/deploy/#resources) configures physical resource constraints for container to run on platform.
+- [Docker Resource Management in Detail](https://tbhaxor.com/docker-resource-management-in-detail/)
+
 
 Physical system resources such as memory and time on the CPU are scarce. If the resource consumption of processes on a computer exceeds the available physical resources, the processes will experience performance issues and may stop running.
 
@@ -133,9 +143,44 @@ Many of these features require your kernel to support Linux capabilities.
 
 > On Ubuntu or Debian hosts you may see messages similar to the following when working with an image: `Your kernel does not support cgroup swap limit capabilities`. Follow the instruction [here](https://docs.docker.com/engine/install/troubleshoot/#kernel-cgroup-swap-limit-capabilities). Memory and swap accounting incur an overhead of about 1% of the total available memory and a 10% overall performance degradation, even if Docker is not running.
 
-- [Runtime options with Memory, CPUs, and GPUs](https://docs.docker.com/config/containers/resource_constraints/)
-- [resources](https://docs.docker.com/compose/compose-file/deploy/#resources) configures physical resource constraints for container to run on platform.
-- [Docker Resource Management in Detail](https://tbhaxor.com/docker-resource-management-in-detail/)
+### Memory limits
+Memory limits are the most basic restriction you can place on a container. They restrict
+the amount of memory that processes inside a container can use. Memory limits are
+useful for ensuring that one container can’t allocate all of the system’s memory, starving
+other programs for the memory they need. You can put a limit in place by using
+the `-m or --memory` flag on the docker container run or docker container create
+commands. The flag takes a value and a unit. Most of these options take a positive integer, followed by a suffix of `b`, `k`, `m`, `g`, to indicate bytes, kilobytes, megabytes, or gigabytes.
+
+Run a new container without memory limits:
+- `sudo docker run -d --rm --name no-limit alpine tail -f /dev/null`
+- `sudo docker ps`
+- Check the free memory in the container: `sudo docker stats no-limit` (all the host memory is available to the container)
+- Stop the container: `sudo docker rm -f no-limit`
+
+Run a new container with memory limits:
+- `sudo docker run -d --rm --name limit --memory 100m alpine tail -f /dev/null`
+- `sudo docker ps`
+- Check the free memory in the container: `sudo docker stats limit` (the container has 100MB of memory available)
+- Stop the container: `sudo docker rm -f limit`
+
+The most important thing to understand about **memory limits is that they’re not reservations**. They don’t guarantee that the specified amount of memory will be available. They’re only a protection from over consumption. Additionally, the implementation of the memory accounting and limit enforcement by the Linux kernel is very efficient, so you don’t need to worry about runtime overhead for this feature.
+
+Understand that there are **several ways that software can fail if it exhausts the available memory**. Some programs may fail with a memory access fault, whereas others may start writing out-of-memory errors to their logging. Docker neither detects this problem nor attempts to mitigate the issue. The best it can do is apply the restart logic you may have specified using the `--restart` flag.
+
+### CPU limits
+By default, each container's access to the host machine's CPU cycles is unlimited. You can set various constraints to limit a given container's access to the host machine's CPU cycles.
+
+Run a new container without CPU limits:
+- `sudo docker run -d --rm --name no-limit alpine tail -f /dev/null`
+- `sudo docker ps`
+- Check the CPU setting in the container: `sudo docker inspect no-limit | grep Cpu` (the container has access to all the CPUs on the host)
+- Stop the container: `sudo docker rm -f no-limit`
+
+Run a new container with CPU limits:
+- `sudo docker run -d --rm --name limit --cpus 0.5 alpine tail -f /dev/null`
+- `sudo docker ps`
+- Check the CPU setting in the container: `sudo docker inspect limit | grep Cpu` (the container has access to 0.5 CPUs on the host)
+- Stop the container: `sudo docker rm -f limit`
 
 
 ## Building health checks into Docker images
@@ -151,18 +196,17 @@ Docker gives you a neat way to build a real application health check right into 
 Run a container that hosts a simple REST API that returns a random number. The app has a bug, so after few calls to the API, it becomes unhealthy and every subsequent call fails.
 - Move to: `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/05_rnd_number`
 - Look at the files
-- Build the image: `docker build -t random-number-api .`
-- Run the app: `docker container run -d --name rnd-api -p 80:5000 random-number-api`
+- Run the app: `sudo docker compose up -d --build`
 - Check the container status: `docker ps`
 - Run it multiple time from terminal: 
     - `curl -i http://localhost/health`
     - `curl -i http://localhost/rng` (run 5x)
     - `curl -i http://localhost/health`
     - The API behaves correctly for the first five calls, and then it returns an HTTP 500 “Internal Server Error” response.
-- Check the container status: `docker ps`
+- Check the container status: `sudo docker ps`
     - In the container list, the API container has the status Up.
     - The process inside the container is still running, so it looks good as far as Docker is concerned. The container runtime has no way of knowing what’s happening inside that process and whether the app is still behaving correctly.
-- Stop and remove the app: `docker rm -f rnd-api`
+- Stop and remove the app: `sudo docker compose down -v`
 
 Enter the `HEALTHCHECK` instruction, which you can add to a Dockerfile to tell the runtime exactly how to check whether the app in the container is still healthy. The `HEALTHCHECK` instruction **specifies a command for Docker to run inside the container**, which will return a status code—the command can be anything you need to check if your app is healthy. Docker will run that command in the container at a timed interval. 
 - If the status code says everything is good, then the container is healthy.
@@ -170,10 +214,9 @@ Enter the `HEALTHCHECK` instruction, which you can add to a Dockerfile to tell t
 
 > [The `HEALTHCHECK`](https://docs.docker.com/engine/reference/builder/#healthcheck) instruction tells Docker how to test a container to check that it is still working. This can detect cases such as a web server that is stuck in an infinite loop and unable to handle new connections, even though the server process is still running.
 
-Add the `HEALTHCHECK` command in a new Dockerfile for the random
-number API. This health check uses a curl command like I did on my host, but this time it runs inside the container. The `/health` URL is another endpoint in the application that checks if the bug has been triggered; it will return a 200 “OK” status code if the app is working and a 500 “Internal Server Error” when it’s broken.
+This health check uses a curl command, but this time it runs inside the container. The `/health` URL is another endpoint in the application that checks if the bug has been triggered; it will return a 200 “OK” status code if the app is working and a 500 “Internal Server Error” when it’s broken.
 
-The health check makes an HTTP call to the /health endpoint, which the API provides to test if the app is healthy. Using the `--fail` parameter means the curl command will pass the status code on to Docker — if the request succeeds, it returns the number 0, which Docker reads as a successful check. If it fails, it returns a number other than 0, which means the health check failed.
+The health check makes an HTTP call to the `/health` endpoint, which the API provides to test if the app is healthy. Using the `--fail` parameter means the curl command will pass the status code on to Docker — if the request succeeds, it returns the number 0, which Docker reads as a successful check. If it fails, it returns a number other than 0, which means the health check failed.
 
 You can configure how often the health check runs and how many failed checks mean the app is unhealthy. The default is to run every 30 seconds, and for three failures in a row to trigger the unhealthy status.
 The options that can appear before CMD are:
@@ -184,18 +227,17 @@ The options that can appear before CMD are:
 
 Run the same test but using the new image:
 - Look at the files
-- Build the app: `docker build -t random-number-api-health -f Dockerfile.health .`
-- Run the app: `docker container run -d --name rnd-api-health -p 80:5000 random-number-api-health`
-- Wait 30 seconds or so and list the containers: `docker ps`
+- Run the app: `sudo docker compose -f docker-compose.health.yml up -d --build`
+- Wait 30 seconds or so and list the containers: `sudo docker ps`
     - You can see that the new version of the API container initially shows a healthy status.
 - Run it multiple time from terminal: 
     - `curl -i http://localhost/health`
     - `curl -i http://localhost/rng` (run 5x)
     - `curl -i http://localhost/health`
-- Run: `docker ps`
+- Run: `sudo docker ps`
     - That **unhealthy status** is published as an event from Docker’s API, so the platform running the container is notified and can take action to fix the application.
-- Docker also records the result of the most recent health checks, which you can see when you inspect the container: `docker container inspect rnd-api-health`
-- Stop and remove the app: `docker rm -f rnd-api-health`
+- Docker also records the result of the most recent health checks, which you can see when you inspect the container: `sudo docker container inspect rnd-api-health`
+- Stop and remove the app: `sudo docker compose -f docker-compose.health.yml down -v`
 
 The health check is doing what it should: testing the application inside the container and flagging up to Docker that the app is no longer healthy.
 

@@ -5,4 +5,4 @@ services:
       dockerfile: Dockerfile
     environment:
       MAX_COUNTER: 10
-    restart: on-failure
+    restart: always
