@@ -33,6 +33,7 @@
     "Snyk",
     "tmpfs",
     "uncontained",
+    "unlessstopped",
     "WORKDIR"
   ]
 }

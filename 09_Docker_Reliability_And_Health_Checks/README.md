@@ -1,6 +1,5 @@
 # Docker Reliability And Health Checks
 
-<!-- TODO: dodaj primer za našo aplikaicjo -->
 
 ## Self-healing containers with restart policies
 Docker monitors the health of your app at a basic level every time you run a container. Containers run a specific process when they start and Docker **checks that the process is still running**, and if it stops, the container goes into the exited state. That gives you a basic health check that works across all environments. Developers can see that their app is unhealthy if the process fails and the container exits.
@@ -18,31 +17,31 @@ The following restart policies exist:
 - `unless-stopped`: Similar to always, except that when the container is stopped (manually or otherwise), it is not restarted even after Docker daemon restarts.
 
 Start a new interactive container, with the `--restart always` policy, and tell it to run a sleep process.
-- `docker container run -d --name test-restart --restart always nginx:1.23-alpine`
-- `docker ps`
-- Show running processes in container: `docker exec test-restart ps -a`
-- Kill the PID 1 process: `docker exec test-restart kill 1`
+- `sudo docker container run -d --name test-restart --restart always nginx:1.23-alpine`
+- `sudo docker ps`
+- Show running processes in container: `sudo docker exec test-restart ps -a`
+- Kill the PID 1 process: `sudo docker exec test-restart kill 1`
     - Docker will automatically restart it because it has the `--restart always` policy. If you issue a `docker
 ps` command, you’ll see that the container’s uptime is less than the time since it was created.
-- `docker ps`
-- `docker exec test-restart ps -a`
+- `sudo docker ps`
+- `sudo docker exec test-restart ps -a`
 - Be aware that Docker has restarted the same container and not created a new one. In fact, if you inspect it with docker container inspect you can see the RestartCount has been incremented.
-- `docker container inspect test-restart | grep RestartCount`
-- `docker rm -f test-restart`
+- `sudo docker container inspect test-restart | grep RestartCount`
+- `sudo docker rm -f test-restart`
 
 The main difference between the always and unless-stopped policies is that containers with the --restart unless-stopped policy will not be restarted when the daemon restarts if they were in the Stopped (Exited)
 state.
 
 Create the two new containers:
-- `docker container run -d --name always --restart always  alpine sleep 1d`
-- `docker container run -d --name unless-stopped --restart unless-stopped alpine sleep 1d`
-- `docker ps`
-- Stop both containers: `docker container stop always unless-stopped`
-- `docker ps -a`
+- `sudo docker container run -d --name always --restart always  alpine sleep 1d`
+- `sudo docker container run -d --name unless-stopped --restart unless-stopped alpine sleep 1d`
+- `sudo docker ps`
+- Stop both containers: `sudo docker container stop always unless-stopped`
+- `sudo docker ps -a`
 - Restart Docker: `sudo systemctl restart docker`
-- `docker ps -a`
+- `sudo docker ps -a`
     - Notice that the “always” container has been restarted, but the “unlessstopped” container has not.
-- `docker rm -f always unless-stopped`
+- `sudo docker rm -f always unless-stopped`
 
 Keep the following in mind when using restart policies:
 - A restart policy only takes effect after a container starts successfully. In this case, starting successfully means that the container is up for at least 10 seconds and Docker has started monitoring it. This prevents a container which does not start at all from going into a restart loop.
@@ -57,7 +56,7 @@ Docker Compose allows us to configure restart policies to manage multiple contai
 - `unless-stopped`: The policy restarts a container irrespective of the exit code but will stop restarting when the service is stopped
 
 Try the following:
-- Move to folder: `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/00_restart_polcy`
+- Move to folder: `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/00_restart_polcy`
 - Check the `docker-compose.yml` file.
 - Run the app: `docker compose up --build`
     - The container restarts after the error.
@@ -78,7 +77,7 @@ Try the following:
 An init system is a program that’s used to launch and maintain the state of other programs. Any process with PID 1 is treated like an init process by the Linux kernel (even if it is not technically an init system). In addition to other critical functions, an init system starts other processes, restarts them in the event that they fail, transforms and forwards signals sent by the operating system, and prevents resource leaks.
 
 A process running as PID 1 inside a container is treated specially by Linux: it ignores any signal with the default action. As a result, the process will not terminate on SIGINT or SIGTERM unless it is coded to do so.
-- Move to folder: `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/01_app_no_signal_handling`
+- Move to folder: `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/01_app_no_signal_handling`
 - Build the image: `docker build -t pid-01 .`
 - Run: `docker run -d --name pid-01 pid-01`
 - Look at the logs: `docker logs pid-01 -f`
@@ -90,7 +89,7 @@ A process running as PID 1 inside a container is treated specially by Linux: it 
 - `docker rm pid-01`
 
 We added some signal handling in the next example: 
-- `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/02_app_with_signal_handling`
+- `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/02_app_with_signal_handling`
 - Build the image: `docker build -t pid-02 .`
 - Run: `docker run -d --name pid-02 pid-02`
 - `docker ps`
@@ -105,21 +104,21 @@ We added some signal handling in the next example:
 - `docker rm pid-02`
 
 The ENTRYPOINT instruction can also be used in combination with a helper script, allowing it to function in a similar way to the command above, even when starting the tool may require more than one step. For example we can use the `entrypoint.sh` to verify that Postgres is up and healthy before creating our app. 
-- Move to folder: `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/03_app_entrypoint_problem/`
+- Move to folder: `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/03_app_entrypoint_problem/`
 - `docker compose up --build`
 - In the logs we can see that the script is waiting for the database to start.
 - Open a new terminal window:
-    - `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/03_app_entrypoint_problem/`
+    - `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/03_app_entrypoint_problem/`
     - `docker ps -a`
     - Look at the processes in the contianer: `docker exec app ps -aux`.  The `entrypoint.sh` shell script has PID 1, and our `app.py` Python program will have another PID. PID 1 processes in Linux do not have any default signal handlers and as a result will not receive and propogate signals. They are also expected to take on certain responsibilities, such as adopting orphaned processes, and reaping zombie processes.
     - Stop: `docker compose down`. The proccess don't shutdown gracefully.
 
 We can try with the following solution:
-- `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/04_app_entrypoint/`
+- `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/04_app_entrypoint/`
 - The `entrypoint.sh` script uses the exec Bash command so that the final running application becomes the container’s PID 1. This allows the application to receive any Unix signals sent to the container.
 - `docker compose up --build`
 - Open a new terminal window:
-    - `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/04_app_entrypoint/`
+    - `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/04_app_entrypoint/`
     - `docker ps -a`
     - Look at the processes in the contianer: `docker exec app ps -aux`
     - Stop: `docker compose down`. The proccess shutdown gracefully.
@@ -150,7 +149,7 @@ Checking if the container exits it’s a very basic check — it ensures the pro
 Docker gives you a neat way to build a real application health check right into the Docker image, just by adding logic to the Dockerfile. We’ll do that with a simple API container, but first we’ll run it without any health checks to be sure we understand the problem.
 
 Run a container that hosts a simple REST API that returns a random number. The app has a bug, so after few calls to the API, it becomes unhealthy and every subsequent call fails.
-- Move to: `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/05_rnd_number`
+- Move to: `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/05_rnd_number`
 - Look at the files
 - Build the image: `docker build -t random-number-api .`
 - Run the app: `docker container run -d --name rnd-api -p 80:5000 random-number-api`
@@ -213,7 +212,7 @@ Running across a cluster brings new challenges for distributed apps, because you
 In a clustered container platform, however, **you can’t dictate the startup order** of the containers, so for example the web app might start before the API is available. What happens then depends on your application.
 
 Then run the web app container and browse to it. The container is up and the app is available, but you’ll find it doesn’t actually work.
-- Move to folder: `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/06_rnd_number_web`
+- Move to folder: `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/06_rnd_number_web`
 - Build the web container: `docker build -t random-number-web .`
 - Create a network: `docker network create --attachable rnd-net`
 - Run the web container: `docker run -d -p 80:5000 --network rnd-net --name rnd-number-web random-number-web`
@@ -256,7 +255,7 @@ There are a whole lot of advantages to this:
 Docker Compose can go some of the way toward repairing unreliable applications, but it won’t replace unhealthy containers for the same reasons that Docker Engine won’t: you’re running on a single server, and the fix might cause an outage. But it can **set containers to restart if they exit**, and it can **add a health check if there isn’t one already in the image**.
 
 Specifying health check parameters in a Docker Compose file:
-- Move to: `cd ~/docker-k8s/09_Docker_Reliability_And_Health_Checks/examples/07_number_compose/`
+- Move to: `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/07_number_compose/`
 - Check the `docker-compose.yml` file
     - You have fine-grained control over the health check. 
     - You can also add a health check in your Compose file for containers that don’t have one declared in the image.

@@ -7,4 +7,3 @@ if __name__ == "__main__":
         time.sleep(1)  # simulate work
         timestamp = datetime.now()
         print(f"[{timestamp}] Working!")
-    

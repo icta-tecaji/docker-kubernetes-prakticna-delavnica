@@ -7,7 +7,7 @@ from datetime import datetime
 def signal_handler(signum, frame):
     print(f"Gracefully shutting down after receiving signal {signum}")
     sys.exit(0)
-    
+
 
 if __name__ == "__main__":
     print("Strating proccesing app!!")
@@ -17,4 +17,3 @@ if __name__ == "__main__":
         time.sleep(1)  # simulate work
         timestamp = datetime.now()
         print(f"[{timestamp}] Working!")
-    
