@@ -259,5 +259,5 @@ Specifying health check parameters in a Docker Compose file:
     - You can also add a health check in your Compose file for containers that don’t have one declared in the image.
     - It’s good to add a health check to all containers, but this example comes together with the dependency check in the image and the `restart: on-failure` setting, which means that if the container exits unexpectedly, Docker will restart it.
 - Start the app: `sudo docker compose up -d`
-- `sudo docker compose ps`
+- `sudo docker compose ps` (wait for a minute to see the health status)
 - Stop the app: `sudo docker compose down`
