@@ -58,12 +58,8 @@ Container Orchestration envisions a number of features, some of which are mentio
 
 
 
-
-
-
 ## Docker Swarm vs. Kubernetes
-- https://www.suse.com/c/rancher_blog/docker-swarm-vs-kubernetes/
-
+- [Docker Swarm vs. Kubernetes](https://www.suse.com/c/rancher_blog/docker-swarm-vs-kubernetes/)
 
 
 

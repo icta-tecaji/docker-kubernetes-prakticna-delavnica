@@ -144,13 +144,13 @@ Most Kubernetes clusters also contain several other components. This includes a 
 
 Kubernetes versions are expressed as x.y.z, where x is the major version, y is the minor version, and z is the patch version, following Semantic Versioning terminology. 
 
-The Kubernetes project maintains release branches for the most recent three minor releases (1.25, 1.24, 1.23). Kubernetes 1.19 and newer receive approximately 1 year of patch support. Kubernetes 1.18 and older received approximately 9 months of patch support.
+The Kubernetes project maintains release branches for the most recent three minor releases (1.30, 1.29, 1.28). Kubernetes 1.19 and newer receive approximately 1 year of patch support. Kubernetes 1.18 and older received approximately 9 months of patch support.
 
 > [Version Skew Policy](https://kubernetes.io/releases/version-skew-policy/)
 
 It is always recommended to upgrade the Kubernetes cluster to the latest available stable version. There are several techniques such as rolling updates, and node pool migrations that allow you to complete an update with minimal disruption and downtime.
 
-![Support windows](https://upload.wikimedia.org/wikipedia/en/timeline/ss2e7boz2yrsj4ipyu6e9m44zv1fuo2.png)
+![Support windows](https://upload.wikimedia.org/wikipedia/en/timeline/99cs89acntnndqq7jwnwue9zluyou1b.png)
 <!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-1/v-14/17 -->
 
 
@@ -270,9 +270,9 @@ To interact with Kubernetes, you use a command-line tool called kubectl, pronoun
 To see more detailed information about a node, you use the kubectl describe command, which shows much more: `kubectl describe node <NODE_NAME>`. It displays the status of the node, information about its CPU and memory usage, system information, containers running on the node, and much more.
 
 Usually, to deploy an application, you’d prepare a JSON or YAML file describing all the components that your application consists of and apply that file to your cluster. This would be the **declarative approach**. We’ll use simple, one-line imperative commands to deploy your application.
-- `cd ~/docker-k8s/17_Introduction_to_Kubernetes/examples/test-app`
-- `docker build -t leon11sj/test-app .`
-- `docker push leon11sj/test-app`
+- `cd ~/docker-kubernetes-prakticna-delavnica/17_Introduction_to_Kubernetes/examples/test-app`
+- `sudo docker build -t leon11sj/test-app .`
+- `sudo docker push leon11sj/test-app`
 
 Let’s deploy the application to your Kubernetes cluster. Here’s the command that does this:
 - `kubectl create deployment test --image=leon11sj/test-app`
