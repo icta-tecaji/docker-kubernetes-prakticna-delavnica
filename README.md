@@ -2,6 +2,7 @@
 
 ## Prerequisites
 - Clone this repository: `git clone https://github.com/icta-tecaji/docker-kubernetes-prakticna-delavnica.git`
+- Install and setup UFW firewall
 
 
 ## [Del 1: Intro To Docker](./01_Intro_To_Docker/README.md)

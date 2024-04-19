@@ -26,7 +26,7 @@ When a pod has multiple containers, **all of them run on the same worker node �
 ### One container shouldn’t contain multiple processes
 Imagine an application that consists of several processes that communicate with each other via IPC (Inter-Process Communication) or shared files, which requires them to run on the same computer. You can run all the processes that make up an application in just one container, but that makes the container **very difficult to manage**.
 
-Containers are **designed to run only a single process**, not counting any child processes that it spawns (problems - loggging to standard output, container runtime only restarts the container when the container’s root process dies). Both container tooling and Kubernetes were developed around this fact.
+Containers are **designed to run only a single process**, not counting any child processes that it spawns (problems - logging to standard output, container runtime only restarts the container when the container’s root process dies). Both container tooling and Kubernetes were developed around this fact.
 - Problems with logging to the standard output.
 - Container runtime only restarts the container when the container’s root process dies.
 
@@ -64,13 +64,18 @@ Placing several containers in a single pod is only appropriate if the applicatio
 ![A pod with a primary and sidecar container(s)](./images/img05.png)
 <!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-5/v-14/12 -->
 
+
 Examples:
 - A reverse proxy that converts HTTPS traffic to HTTP
+
 ![A sidecar container that converts HTTPS traffic to HTTP](./images/img06.png)
 <!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-5/v-14/12 -->
+
 - A sidecar container that delivers content to the web server container via a volume. The other container in the pod is an agent that periodically downloads content from an external source and stores it in the web server’s webroot directory. 
+
 ![A sidecar container that delivers content to the web server container via a volume](./images/img07.png)
 <!-- Vir: https://livebook.manning.com/book/kubernetes-in-action-second-edition/chapter-5/v-14/12 -->
+
 - Other examples of sidecar containers are log rotators and collectors, data processors, communication adapters, and others.
 
 When deciding whether to use the sidecar pattern and place containers in a single pod, or to place them in separate pods, ask yourself the following questions:
@@ -94,7 +99,7 @@ changes** by storing these files in a VCS (Version Control System).
 
 ### Creating a YAML manifest for a pod
 Now create an object manifest from scratch.
-- `cd ~/docker-k8s/18_Kubernetes_Pods/examples/`
+- `cd ~/docker-kubernetes-prakticna-delavnica/18_Kubernetes_Pods/examples/`
 - `cat 01_example.yaml`
 
 After you’ve prepared the manifest file for your pod, you can now create the object by posting the file to the Kubernetes API.
@@ -184,12 +189,14 @@ When debugging an application running in a container, it may be necessary to exa
 
 1. INVOKING A SINGLE COMMAND IN THE CONTAINER:
     - `kubectl exec myapp -- ps aux`
-    - `kubectl exec myapp -- curl -s localhost:8080`
 
 > The double dash (--) in the command delimits kubectl arguments from the command to be executed in the container. The use of the double dash isn’t necessary if the command has no arguments that begin with a dash.
 
 2. RUNNING AN INTERACTIVE SHELL IN THE CONTAINER:
-    - If you want to run several commands in the container, you can run a shell in the container as follows: `kubectl exec -it myapp -- bash`
+    - If you want to run several commands in the container, you can run a shell in the container as follows: `kubectl exec -it myapp -- ash`
+    - `apk --update add curl`
+    - `curl -s localhost:8080`
+    - `exit`
 
 > To keep images small and improve security in the container, most containers used in production don’t contain any binary files other than those required for the container’s primary process. This significantly reduces the attack surface, but also means that you can’t run shells or other tools in production containers.
 
@@ -208,9 +215,9 @@ A very popular software package that can provide this functionality is Envoy. Th
 It’s obvious that if you implement TLS support within the Node.js application itself, the application will consume less computing resources and have lower latency because no additional network hop is required, but adding the Envoy proxy could be a faster and easier solution. It also provides a good starting point from which you can add many other features provided by Envoy that you would probably never implement in the application code itself.
 
 Build the Envoy proxy container image:
-- `cd ~/docker-k8s/18_Kubernetes_Pods/examples/02_ssl_proxy`
-- `docker build -t leon11sj/myapp-ssl-proxy:1.2 .`
-- `docker push leon11sj/myapp-ssl-proxy:1.2`
+- `cd ~/docker-kubernetes-prakticna-delavnica/18_Kubernetes_Pods/examples/02_ssl_proxy`
+- `sudo docker build -t leon11sj/myapp-ssl-proxy:1.2 .`
+- `sudo docker push leon11sj/myapp-ssl-proxy:1.2`
 - `cd ..`
 
 The only new fields are the port names, which are included so that anyone reading the manifest can understand what each port number stands for. Run the new service:
@@ -232,7 +239,7 @@ Open the URLs:
 The pod contains two containers, so if you want to display the logs, you must specify the name of the container using the `--container` or `-c` option.
 - `kubectl logs myapp-ssl -c myapp`
 - `kubectl logs myapp-ssl -c envoy`
-- `kubectl logs myapp-ssl --all-containers`
+- `kubectl logs myapp-ssl --all-containers=true`
 
 If you’d like to run a shell or another command in one of the pod’s containers using the kubectl exec command, you also specify the container name using the `--container` or `-c` option.
 - `kubectl exec -it myapp-ssl -c envoy -- bash`
@@ -268,12 +275,12 @@ Let’s look at an example of adding two init containers to the pod.
 - The second init container performs a network connectivity test.
 
 Build the images:
-- `cd ~/docker-k8s/18_Kubernetes_Pods/examples/03_init_demo`
-- `docker build -t leon11sj/init-demo:1.0 .`
-- `docker push leon11sj/init-demo:1.0`
-- `cd ~/docker-k8s/18_Kubernetes_Pods/examples/03_network_checker/`
-- `docker build -t leon11sj/network-checker:1.0 .`
-- `docker push leon11sj/network-checker:1.0`
+- `cd ~/docker-kubernetes-prakticna-delavnica/18_Kubernetes_Pods/examples/03_init_demo`
+- `sudo docker build -t leon11sj/init-demo:1.0 .`
+- `sudo docker push leon11sj/init-demo:1.0`
+- `cd ~/docker-kubernetes-prakticna-delavnica/18_Kubernetes_Pods/examples/03_network_checker/`
+- `sudo docker build -t leon11sj/network-checker:1.0 .`
+- `sudo docker push leon11sj/network-checker:1.0`
 - `cd ..`
 
 Before you create the pod from the manifest file, run the following command in a separate terminal so you can see how the pod’s status changes as the init and regular containers start:
@@ -292,7 +299,7 @@ enter the running container, just as you can with regular containers.
 Deleting a pod will terminate its containers and remove them from the node.
 
 The easiest way to delete an object is to delete it by name.
-- `kubectl delete pod myapp`
+- `kubectl delete pod myapp-init`
 
 By deleting a pod, you state that you no longer want the pod or its containers to exist. The Kubelet shuts down the pod’s containers, removes all associated resources, such as log files, and notifies the API server after this process is complete. The Pod object is then removed.
 
