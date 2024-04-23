@@ -299,7 +299,7 @@ If the image does have a volume, the volume flag can override it for the contain
 - `sudo docker volume ls`
 - `sudo docker stop test`
 - `sudo docker rm -v test` (Remove anonymous volumes associated with the container)
-- `docker volume prune`
+- `sudo docker volume prune`
 
 ## Run containers as non-root user
 There are two reasons to avoid running as root, both security related.

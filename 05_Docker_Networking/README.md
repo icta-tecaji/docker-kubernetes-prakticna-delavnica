@@ -224,7 +224,7 @@ If you want to completely disable the networking stack on a container, you can u
 Check the container’s network stack, by executing some common networking commands within the container. 
 - `sudo docker exec no-net-alpine ip link show` (Notice that no `eth0` was created.)
 - `sudo docker exec no-net-alpine ip route` (The command returns empty because there is no routing table.)
-- `docker stop no-net-alpine`
+- `sudo docker stop no-net-alpine`
 
 ## Port Mapping
 By default, when you create or run a container using `docker create` or `docker run`, it **does not publish any of its ports to the outside world**. 
