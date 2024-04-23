@@ -389,11 +389,11 @@ Multi-stage builds have a **single Dockerfile containing multiple FROM instructi
 
 To show how this works, let’s adapt the Dockerfile from the previous section to use multi-stage builds.
 - `cd 06_Building_Images/examples/08_python_app_multi_stage/`
-- `docker image ls smart-api` (size of the image)
+- `sudo docker image ls smart-api` (size of the image)
 - `cat Dockerfile.prod`
 - `sudo docker image build -t smart-api-prod -f Dockerfile.prod .`
 - `sudo docker run --rm -d --name smart-api -p 80:5000 smart-api-prod`
-- `docker image ls smart-api-prod` (size of the image)
+- `sudo docker image ls smart-api-prod` (size of the image)
 - `sudo docker stop smart-api`
 
 

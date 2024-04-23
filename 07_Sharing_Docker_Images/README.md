@@ -126,8 +126,8 @@ You can pull an image from Docker Hub and push it to your registry. The followin
 - Remove the locally-cached images, so that you can test pulling the image from your registry:
     - `sudo docker image remove ubuntu:20.04`
     - `sudo docker image remove localhost:5000/my-ubuntu`
-- Pull the localhost:5000/my-ubuntu image from your local registry: `docker pull localhost:5000/my-ubuntu`
-- Stop a local registry: `docker container stop registry && docker container rm -v registry`
+- Pull the localhost:5000/my-ubuntu image from your local registry: `sudo docker pull localhost:5000/my-ubuntu`
+- Stop a local registry: `docker container stop registry && sudo docker container rm -v registry`
 
 ## Using image tags effectively
 You can put any string into a Docker image tag, and as you’ve already seen, you can **have multiple tags for the same image**. You’ll use that to version the software in your images and let users make informed choices about what they want to use—and to make your own informed choices when you use other people’s images.
