@@ -56,7 +56,7 @@ Docker Compose allows us to configure restart policies to manage multiple contai
 - `unless-stopped`: The policy restarts a container irrespective of the exit code but will stop restarting when the service is stopped
 
 Try the following:
-- Move to folder: `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/00_restart_polcy`
+- Move to folder: `cd ~/docker-kubernetes-prakticna-delavnica/09_Docker_Reliability_And_Health_Checks/examples/00_restart_policy`
 - Check the `docker-compose.yml` file.
 - Run the app: `sudo docker compose up -d --build`
     - `sudo docker compose logs -f`
@@ -69,7 +69,7 @@ Try the following:
 - Stop the app: `sudo docker compose down`
 - Change the `restart` filed to `on-failure` in the `docker-compose.yml` file.
 - Run the app: `sudo docker compose up --build`
-- Check: `sudo docker compose ps` and `udo docker compose logs -f`.
+- Check: `sudo docker compose ps` and `sudo docker compose logs -f`.
     - The app is not restarting. The container exited on code 0 (success).
 - Stop the app: `sudo docker compose down`
 - Change the exit code to 1: `sys.exit(1)` in the `app.py` file.
