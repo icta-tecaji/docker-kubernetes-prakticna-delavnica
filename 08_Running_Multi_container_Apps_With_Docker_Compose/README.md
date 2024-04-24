@@ -184,3 +184,24 @@ Few more steps:
 
 ## Advanced Compose features (Advanced)
 More [here](./Advanced_Compose_features.md).
+
+
+## Example: Run ownCloud in Docker Compose
+
+[ownCloud](https://owncloud.com/) is a self-hosted open-source file sync and share server. It provides access to your data through a web interface, sync clients, or WebDAV while providing a platform to view, sync, and share across devices easily—all under your control. ownCloud’s open architecture is extensible via a simple but powerful API for applications and plugins and it works with any storage.
+
+On the following [link](https://doc.owncloud.com/server) you can find all the information about the ownCloud Classic Server.
+
+In our case, we will install ownCloud using Docker.
+
+> Precise instructions for Docker installation can be found [here](https://doc.owncloud.com/server/10.14/admin_manual/installation/docker/).
+
+
+The installation is done as follows:
+1. Move to the folder: `cd ~/docker-kubernetes-prakticna-delavnica/08_Running_Multi_container_Apps_With_Docker_Compose/examples/04_owncloud_example`
+2. Open the file: `nano .env` and change `OWNCLOUD_DOMAIN` and `OWNCLOUD_TRUSTED_DOMAINS` according to the IP that the VM has.
+3. Run the command: `sudo docker compose up -d`
+4. After the installation is complete, check if all containers are running with the command: `sudo docker compose ps`. If any container still has the status `running (starting)` you can check the logs in more detail with the command `sudo docker compose logs --follow owncloud`.
+5. Go to the address `http://<IP>` in the browser and log in to ownCloud (usr: admin, pass: admin).
+6. After logging in, you can browse the website and test various functionalities (uploading documents, sharing documents, adding users...).
+7. After you are done, you can remove the installation with the command `sudo docker compose down -v`.

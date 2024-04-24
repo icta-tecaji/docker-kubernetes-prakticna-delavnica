@@ -102,6 +102,7 @@
 - Production deployment with Compose: icta_app_production
 - Scaling and Load Balancing using Compose
 - Advanced Compose features (Advanced)
+- Example: Run ownCloud in Docker Compose
 
 ## [Del 9: Docker Reliability And Health Checks](./09_Docker_Reliability_And_Health_Checks/README.md)
 - Self-healing containers with restart policies
