@@ -2,6 +2,87 @@
 
 - [Docker Dokumentacija](https://docs.docker.com/)
 
+## Containers History
+- **Applications are at the heart of businesses**. If applications break, businesses break.
+- Most applications run on servers. **In the past we could only run one application per server**.
+    - Windows and Linux just didn’t have the technologies to safely and securely run multiple applications on the same server.
+- Every time the business needed a new application, the IT department would **buy a new server**. Most of the time **nobody knew the performance requirements** of the new application, forcing the IT department to make guesses when choosing the model and size of the server to buy.
+- This resulted in over-powered servers operating as low as 5-10% of their potential capacity. A **tragic waste of company capital and environmental resources**.
+
+### Virtual Machines
+- VMware, Inc. gave the world a gift - the virtual machine (VM). IT departments no longer needed to procure a brand-new oversized server every time the business needed a new application.
+- VMs aren't perfect:
+    - Every VM requires its own dedicated operating system (OS).
+    - Every OS consumes CPU, RAM and other resources that could otherwise be used to power more applications.
+    - Every OS needs patching and monitoring.
+    - And in some cases, every OS requires a license.
+    - VMs are slow to boot, and portability isn’t great — migrating and moving VM workloads between hypervisors and cloud platforms is harder than it needs to be.
+    - Results in wasted time and resources.
+
+### Containers
+- For a long time, the big web-scale players, like Google, have been using container technologies to address the shortcomings of the VM model.
+- In the container model, the container is roughly analogous to the VM. A major difference is that **containers do not require their own full-blown OS**. In fact, all containers on a single host share the host’s OS. This frees up huge amounts of system resources such as CPU, RAM, and storage. It also reduces potential licensing costs and reduces the overhead of OS patching and other maintenance.
+- **Containers are also fast to start and ultra-portable**. Moving container workloads from your laptop, to the cloud, and then to VMs or bare metal in your data center is a breeze.
+- Modern containers started in the Linux world and are the product of an immense amount of work from a wide variety of people over a long period of time.
+- Some of the major technologies that enabled the massive growth of containers in recent years include; kernel namespaces, control groups, union filesystem, and of course Docker.
+
+> There are many operating system virtualization technologies similar to containers that predate Docker and modern containers. Some even date back to System/360 on the Mainframe. BSD Jails and Solaris Zones are some other well-known examples of Unix-type container technologies.
+
+- But for now, it’s enough to say that Docker was the magic that made Linux containers usable. Put another way, Docker, Inc. made containers simple!
+
+### Timeline
+Container technology has existed for a long time in different forms, but it has significantly gained popularity recently in the Linux world with the introduction of native containerization support in the Linux kernel. System containers are technically the oldest type of containers. 
+- 1982: Chroot (Unix-like operating systems)
+- 1999: **BSD introduced jails**, a way of running a second BSD system on the same kernel as the main system.
+- 2001: Linux implementation of the concept through Linux **vServer**. This was a separate project with a big patch set towards Linux kernel aimed at implementing a functionality similar to BSD jails.
+- 2004: Solaris (Sun Solaris, Open Solaris) grew Zones which was the same concept but a part of Solaris OS.
+- 2005: OpenVZ project started to implement multiple VPSs (virtual private servers) on Linux.
+- 2008: LXC (Linux)
+- 2013: Docker (Linux, FreeBSD, Windows)
+
+## Containerization vs traditional virtualization
+Virtualization was developed as an effort to **fully utilize available computing resources**. Virtualization enables multiple virtual machines to run on a single host for different purposes with their own isolated space. 
+
+Virtualization achieved such isolated operating system environments using hypervisors, computer software that sits in between the host operating system and the guest or the virtual machine’s operating system.
+
+Containerization differs from traditional virtualization technologies and offers many advantages over traditional virtualization:
+- Containers are **lightweight** compared to traditional virtual machines.
+- Unlike containers, virtual machines require emulation layers (either software or hardware), which consume more resources and add additional overhead.
+- Containers share resources with the underlying host machine, with user space and use process isolation.
+- Due to the lightweight nature of containers, more containers can be run per host than virtual machines per host.
+- Starting a container happens nearly instantly compared to the slower boot process of virtual machines.
+- Containers are portable and can reliably regenerate a system environment with required software packages, irrespective of the underlying host operating system.
+
+## Introduction to Containers
+Containerization is the next logical step in virtualization, and there is a huge buzz around this technology. Containers can **provide virtualization at both the operating system level and the application level.**
+
+Some of the possibilities with containers are as follows:
+- Provide a complete operating system environment that is sandboxed (isolated)
+- Allow packaging and isolation of applications with their entire runtime environment
+- Provide a portable and lightweight environment
+- Help to maximize resource utilization in data centers
+- Aid different development, test, and production deployment workflows
+
+## Container Definition
+A **container can be defined as a single operating system image, bundling a set of isolated applications and their dependent resources so that they run separated from the host machine.** There may be multiple such containers running within the same host machine.
+
+Containers can be classified into two types:
+- **Operating system level**: An entire operating system runs in an isolated space within the host machine, sharing the same kernel as the host machine.
+- **Application level**: An application or service, and the minimal processes required by that application, runs in an isolated space within the host machine.
+
+## What types of containers are there?
+- **System containers** (as run by LXD) are similar to virtual or physical machines. They **run a full operating system inside them**, you can run any type of workload, and you manage them exactly as you would a virtual or a physical machine. System containers are usually **long-lasting** and you could host **several applications** within a single system container. That means you can install packages inside them, you can manage services, define backup policies, monitoring, and all other aspects as you usually would with a virtual machine.
+- **Application containers** (such as Docker), also known as process containers, are containers that **package and run a single process or a service** per container. They run **stateless types of workloads** that are meant to be ephemeral. This means that these containers are temporary, and you can create, delete and replace containers easily as needed. Usually, you don’t need to care about the lifecycle of those containers.
+
+> A common confusion for potential users of LXD is that LXD is an alternative to Docker or Kubernetes. However, LXD and Docker are not competing container technologies, and they tend to serve completely different purposes.
+
+![LXD vs Docker](./images/system_vs_app_cont.png)
+<!-- Source: https://ubuntu.com/blog/lxd-vs-docker -->
+
+Both application and system containers share a kernel with the host operating system and utilize it to create isolated processes.
+- Application containers run a single app/process.
+- System containers run a full operating system giving them flexibility for the workload types they support.
+
 
 ## Docker overview
 - Docker is an **open platform for developing, shipping, and running applications**. 
